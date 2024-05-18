@@ -1,7 +1,7 @@
  
 # Hive_P2P_Bot
 
-This is a Python Based Telegram Bot for publishing and managing P2P exchange offers native to the HIVE blockchain. This development has been made by the [HiveCuba](https://ecency.com/hive-10053/@ertytux/hivecuba-p2p-como-funciona-es) community.  It is based on a guaranteed custody mechanism by the guarantor account, trusted and supported by the  community owner of the bot. It has zero commissions for users who have a subscription delegation to a manager HIVE account (sometime the same as HIVE's Bot account or the trusted comunity HIVE account).
+This is a Python-based Telegram Bot for publishing and managing P2P exchange offers native to the HIVE blockchain. This development has been made by the [HiveCuba](https://ecency.com/hive-10053/@ertytux/hivecuba-p2p-como-funciona-es) community.  It is based on a guaranteed custody mechanism by the guarantor account, trusted and supported by the community owner of the bot. It has zero commissions for users who have a subscription delegation to a manager HIVE account (sometimes the same as HIVE's Bot account or the trusted community HIVE account).
 
 See more [here](https://ecency.com/hive-10053/@ertytux/hivecuba-p2p-como-funciona-es)
 
@@ -16,7 +16,7 @@ sudo apt install python3-pip
 
 ## Requirements for deployment
 
-In order to run the P2P Bot you need:
+To run the P2P Bot you need:
 
 * Cloning the Bot project
 ```Bash
@@ -47,8 +47,8 @@ price -To know the price of a currency using Coingecko as a reference and yadio.
 msg -Send messages to the offers channel (Admins only)
 ```
 * Have an account in HIVESQL, see https://hivesql.io/registration/.
-* Create an receptor account in HIVE that operates the bot.
-* Designate an account manager in HIVE that will receive HP delegations to have zero fee.
+* Create a receptor account in HIVE that operates the bot.
+* Designate an account manager in HIVE that will receive HP delegations to have zero fees.
 * Create a Telegram channel for offers and add the bot user as administrator. You can also associate a chat group to serve as support.
 * With the information collected in the previous steps edit the *env_example* file.
 ```Bash
@@ -83,7 +83,7 @@ export bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
 ## How you can contribute
 
 * If it is of interest to you, you can use the [HiveCuBaP2P_Bot](https://t.me/HiveCuBaP2P_Bot) functional bot to get acquainted and check its functionality.
-* Any suggestion, change proposal or code can be made here on GitHub, we apply our [FOSS](https://osssoftware.org/blog/free-and-open-source-software-foss-core-principles/) policies in our development and everyone is welcome to contribute.
+* Any suggestion, change proposal, or code can be made here on GitHub, we apply our [FOSS](https://osssoftware.org/blog/free-and-open-source-software-foss-core-principles/) policies in our development and everyone is welcome to contribute.
 
 ## Donations
 You can donate to our project using HIVE or HBD with the account `hivecuba.p2p` con el memo `Donate` or using bitcoin lighting to the account `hivecuba.p2p@sats.v4v.app`. 
