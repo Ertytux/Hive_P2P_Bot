@@ -41,7 +41,7 @@ python3 -mvev env
    - Use the `/newbot` command to create a new bot.
    - Follow the instructions to choose a name and username for your bot.
    - You'll receive a unique *YOUR_BOT_TOKEN* API token for your bot. Save it securely.
-* Add to your bot's command configuration the following:
+* Add to your bot's command configuration as the following:
 ```Bash
 start -Reset your user's settings
 escrow -Learn about our escrow system at HIVE
@@ -95,7 +95,7 @@ export bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
 * Any suggestion, change proposal, or code can be made here on GitHub, we apply our [FOSS](https://osssoftware.org/blog/free-and-open-source-software-foss-core-principles/) policies in our development and everyone is welcome to contribute.
 
 ## Donations
-You can donate to our project using HIVE or HBD with the account `hivecuba.p2p` con el memo `Donate` or using bitcoin lighting to the account `hivecuba.p2p@sats.v4v.app`. 
+You can donate to our project using HIVE or HBD with the account `hivecuba.p2p` with the memo `Donate` or using bitcoin lighting to the account `hivecuba.p2p@sats.v4v.app`. 
 
 Thank you very much in advance!!
 
