@@ -3,6 +3,14 @@
 
 This is a Python-based Telegram Bot for publishing and managing P2P exchange offers native to the HIVE blockchain. This development has been made by the [HiveCuba](https://ecency.com/hive-10053/@ertytux/hivecuba-p2p-como-funciona-es) community.  It is based on a guaranteed custody mechanism by the guarantor account, trusted and supported by the community owner of the bot. It has zero commissions for users who have a subscription delegation to a manager HIVE account (sometimes the same as HIVE's Bot account or the trusted community HIVE account).
 
+
+![imagen.png](https://files.peakd.com/file/peakd-hive/ertytux/23tGXuviKJMM4EcWuqfYgmyWKoSXEFkiWp8DeDUN79pQTPyWN38KKAy22tzdN8rddxvg1.png)
+<sub>
+Screenshot in https://t.me/HiveCuBaP2P_Bot
+</sub>
+
+
+
 See more [here](https://ecency.com/hive-10053/@ertytux/hivecuba-p2p-como-funciona-es)
 
 ## Software requirements
