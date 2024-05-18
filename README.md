@@ -5,6 +5,7 @@ This is a Python-based Telegram Bot for publishing and managing P2P exchange off
 
 
 ![imagen.png](https://files.peakd.com/file/peakd-hive/ertytux/23tGXuviKJMM4EcWuqfYgmyWKoSXEFkiWp8DeDUN79pQTPyWN38KKAy22tzdN8rddxvg1.png)
+
 <sub>
 Screenshot in https://t.me/HiveCuBaP2P_Bot
 </sub>
