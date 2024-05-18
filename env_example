@@ -1,0 +1,25 @@
+#BOT
+export hcbtoken=YOUR_BOT_TOKEN
+export hcburl=https://t.me/YOUR_BOT_USERNAME
+
+#HIVESQL
+export hivesqlserver=vip.hivesql.io 
+export hivesqldb=DBHive
+export hivesqluser=YOUR_HIVESQL_USERNAME
+export hivesqlpsw=YOUR_HIVESQL_PASSWD
+
+#TELEGRAM PUBLIC OFFERT CHANNEL YOUR_BOT_USERNAME must be admin
+export hcbchat=@YOUR_TELEGRAM_OFFERT_CHANNEL
+
+
+#HIVE BOT ACCOUNT 
+export bothiveuser=YOUR_BOT_HIVE_USERNAME
+export activekey=YOUR_BOT_HIVE_ACTIVE_KEY
+
+#HIVE ACCOUNT TO DELEGATE AND GET 0 FEE
+export bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
+
+
+
+
+
