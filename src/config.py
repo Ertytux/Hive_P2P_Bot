@@ -3,6 +3,9 @@ import os
 # Bot Main Config
 envnhcbchatir = "hcbchat"
 hcbchatid = os.environ.get(envnhcbchatir)
+envnhbbsupchat="hcbsup"
+hcbsup = os.environ.get(envnhbbsupchat)
+
 envboturl = "hcburl"
 boturl = os.environ.get(envboturl)
 

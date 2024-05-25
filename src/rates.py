@@ -47,7 +47,7 @@ def getPrice(coin:str)->str:
 
 """
     except:
-        msg="No disponible//Not available!!!"
+        msg="No esta disponible//It is not available!!!"
     return msg
 
 

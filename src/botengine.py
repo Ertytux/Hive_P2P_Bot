@@ -1,6 +1,7 @@
 # from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ForceReply, ReplyKeyboardRemove
 # from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
+from config import hcbchatid, blacklist, admins, supports, boturl, hcbchatid, receptor, manager
 import datetime
 from tools import is_number, getHoursfromDate
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -20,7 +21,6 @@ import os
 tokenAcepted = ['HIVE', 'HBD']
 squence = ['amouni', 'tokeni', 'amouno', 'tokeno', 'pmetod']
 
-from config import hcbchatid,blacklist,admins,supports,boturl,hcbchatid,receptor,manager
 
 # Communities
 communities = {'mycomm': hcbchatid}
@@ -68,8 +68,8 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return None
     stext = update.message.text.split()
     if len(stext) < 2:
-        msg = {'es': 'Comando incorrecto debe ser por ejemplo: /price VES ',
-               'en': 'Incorrect command must be for example: /price GHS '}
+        msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /price VES ',
+               'en': 'Incorrect command, it must be for example: /price GHS '}
         await update.message.reply_text(msg.get(scode))
         return None
     await update.message.reply_text(rt.getPrice(stext[1]))
@@ -106,7 +106,7 @@ async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 **HIVE user**: `{data.get('hiveuser')}`
 ** Delegate to** `{manager}`: {'Yes' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
 **Number of completed orders**: `{data.get('norders')}`
-**Reputation in HIVE**: `{await reputationHiveUser(data.get('hiveuser')):.2f}`
+**Reputation on HIVE**: `{await reputationHiveUser(data.get('hiveuser')):.2f}`
 """
         await update.message.reply_markdown(msg)
 # OKX
@@ -128,8 +128,8 @@ async def hiveuser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         username = user.username.lower()
         stext = update.message.text.split()
         if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto debe ser por ejemplo: /hiveuser juanperes ',
-                   'en': 'Incorrect command must be for example: /hiveuser juanperes '}
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /hiveuser juanperes ',
+                   'en': 'Incorrect command, must be for example: /hiveuser juanperes '}
             await update.message.reply_text(msg.get(scode))
             return None
         hiveU = stext[1].lower()
@@ -137,11 +137,11 @@ async def hiveuser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await dmr.setUserhiveuser(username, hiveU, status)
         if status:
             msg = {'es': f"Usuario {hiveU} registrado correctamente, gracias por apoyar a `{manager}`",
-                   'en': f"User {hiveU} successfully registered, thank you for supporting `{manager}`"}
+                   'en': f"User {hiveU} is now successfully registered, thank you for supporting `{manager}`"}
             await update.message.reply_markdown(msg.get(scode))
         else:
             msg = {'es': f"Usuario {hiveU} registrado correctamente, delegue al menos 50 HP a `{manager}` para disfrutar cero comisiones",
-                   'en': f"user {hiveU} registered correctly, delegate at least 50 HP to `{manager}` to enjoy zero commissions"}
+                   'en': f"User {hiveU} is now registered correctly, delegate at least 50 HP to `{manager}` to enjoy zero commissions"}
             await update.message.reply_markdown(msg.get(scode))
             await update.message.reply_markdown(messages_notHP.get(scode))
 # OKX
@@ -159,12 +159,12 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         stext = update.message.text.split()
         if username not in admins:
             msg = {'es': "Usted no tiene permisos para enviar mensajes al canal",
-                   'en': "You do not have permissions to send messages to the channel"}
+                   'en': "You don't have permissions to send messages to the channel"}
             await update.message.reply_text(msg.get(scode))
             return None
         if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto debe ser por ejemplo: /msg mensaje ',
-                   'en': 'Incorrect command must be for example: /msg message '}
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /msg mensaje ',
+                   'en': 'Incorrect command, must be for example: /msg message '}
             await update.message.reply_text(msg.get(scode))
             return None
         sent_message = await context.bot.send_message(chat_id=hcbchatid, text=str.join(" ", stext[1:]))
@@ -189,14 +189,14 @@ async def release(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if username not in admins:
             msg = {'es': "Usted no tiene permisos",
-                   'en': "You do not have permissions"}
+                   'en': "You don't have permissions"}
             await update.message.reply_text(msg.get(scode))
             return None
         stext = update.message.text.split()
 
         if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto debe ser por ejemplo: /release 34564564576445234563 ',
-                   'en': 'Incorrect command must be for example: /release 34564564576445234563 '}
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /release 34564564576445234563 ',
+                   'en': 'Incorrect command, must be for example: /release 34564564576445234563 '}
             await update.message.reply_text(msg.get(scode))
             return None
 
@@ -214,7 +214,7 @@ async def release(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if dstatus == 'finish':
             msg = {'es': f"Esta orden {orderid} ya fue completada",
-                   '    en': f"This order {orderid} has already been completed"}
+                   'en': f"This order {orderid} has been completed"}
             await update.message.reply_text(msg.get(scode))
             return None
 
@@ -245,14 +245,14 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if username not in admins:
             msg = {'es': "Usted no tiene permisos",
-                   'en': "You do not have permissions"}
+                   'en': "You don't have permissions"}
             await update.message.reply_text(msg.get(scode))
             return None
         stext = update.message.text.split()
 
         if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto debe ser por ejemplo: /back 34564564576445234563 ',
-                   'en': 'Incorrect command must be for example: /back 34564564576445234563 '}
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /back 34564564576445234563 ',
+                   'en': 'Incorrect command, must be for example: /back 34564564576445234563 '}
             await update.message.reply_text(msg.get(scode))
             return None
         orderid = stext[1]
@@ -287,14 +287,14 @@ async def orderinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if username not in admins:
             msg = {'es': "Usted no tiene permisos",
-                   'en': "You do not have permissions"}
+                   'en': "You don't have permissions"}
             await update.message.reply_text(msg.get(scode))
             return None
         stext = update.message.text.split()
 
         if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto debe ser por ejemplo: /orderinfo 34564564576445234563 ',
-                   'en': 'Incorrect command must be for example: /orderinfo 34564564576445234563 '}
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /orderinfo 34564564576445234563 ',
+                   'en': 'Incorrect command, must be for example: /orderinfo 34564564576445234563 '}
             await update.message.reply_text(msg.get(scode))
             return None
         orderid = stext[1]
@@ -323,14 +323,14 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         username = user.username.lower()
         if username not in admins:
             msg = {'es': "Usted no tiene permisos para enviar mensajes al canal",
-                   'en': "You do not have permissions to send messages to the channel"}
+                   'en': "You don't have permissions to send messages to the channel"}
             await update.message.reply_text(msg.get(scode))
             return None
         stext = update.message.text.split()
         uchatid = update.message.chat_id
         if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto debe ser por ejemplo: /notify mensaje ',
-                   'en': 'Incorrect command must be for example: /notify message '}
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /notify mensaje ',
+                   'en': 'Incorrect command, must be for example: /notify message '}
             await update.message.reply_text(msg.get(scode))
             return None
         chat_ids = await dmr.getUsersChats()
@@ -373,7 +373,7 @@ async def setorder(stype: str, update: Update, context: ContextTypes.DEFAULT_TYP
     mtext = update.message.text
     if '@' in mtext:
         msgN = {'es': "No se admite una orden que revele explícitamente el nombre de usuario.",
-                'en': "An order that explicitly reveals the user name is not supported."}
+                'en': "An order that explicitly reveals the user name is not allowed."}
         await update.message.reply_text(msgN.get(scode))
         return None
 
@@ -388,10 +388,10 @@ async def setorder(stype: str, update: Update, context: ContextTypes.DEFAULT_TYP
         tokenI: str = stext[2]
         if tokenI.upper() not in tokenAcepted:
             errms = {'es': f"""
-Solo se aceptan los siguientes tokens de intercambio de HIVE:  
+Solo se aceptan los siguientes tokens:  
 {tokenAcepted}
 """, 'en': f"""
-Only the following HIVE exchange tokens are accepted:  
+Only the following tokens are accepted:  
 {tokenAcepted}
 """}
             await update.message.reply_markdown(errms.get(scode))
@@ -522,8 +522,8 @@ async def scancel(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: lis
     scode = getlang(user.language_code)
     username = user.username.lower()
     if len(stext) < 2:
-        msg = {'es': "Comando incorrecto utilice por ejemplo: /cancel 3453453626423413423",
-               'en': "Incorrect command use for example: /cancel 3453453626423413423"}
+        msg = {'es': "Comando incorrecto, utilice por ejemplo: /cancel 3453453626423413423",
+               'en': "Incorrect command, use for example: /cancel 3453453626423413423"}
         await update.message.reply_text(msg.get(scode))
         return None
     orderid = stext[1]
@@ -639,8 +639,8 @@ async def stake(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: list)
     xchatid, xhiveuser = await dmr.getUserchatid(username)
 
     if xhiveuser == None or xhiveuser == '':
-        msg = {'es': 'Debe registrar primero su usuario de HIVE con /hiveuser nombreusuario',
-               'en': 'You must first register your HIVE user with /hiveuser username'}
+        msg = {'es': 'Debe registrar primero su usuario de HIVE con: /hiveuser nombreusuario',
+               'en': 'You must first register your HIVE user with: /hiveuser username'}
         await update.message.reply_text(msg.get(scode))
         return None
 
@@ -725,7 +725,7 @@ Si está de acuerdo **Confirme**. En caso contrario **Cancele**.
                 msg = f"""
 You are going to {optmsg}    
 Amount {amouni}  {tokeni.upper()}   
-by   
+with   
 {amouno} {tokeno.upper()}   
 Using {pmethod}    
 Corresponding to the order {orderid} 
@@ -871,11 +871,11 @@ del bot mediante una disputa.
             else:  # EN
                 sendmsg_s = rf"""
 Order taken `{orderid}`
-You will receive `{amouno}` `{tokeno}` by {pmethod}.
+You will receive `{amouno}` `{tokeno}` using {pmethod}.
 
 You must send **exactly** `{(amouni+fee):.3f}`  `{tokeni}` to the HIVE user `{receptor}`
 
-Put in the Memo *(Mandatory)*: `{orderid}`
+With this Memo *(Mandatory)*: `{orderid}`
 
 A fee of {fee:.3f} {tokeni} is included in the amount to be sent.     
 You can avoid commissions on upcoming trades by delegating at least 50 HP to the HIVE user `{manager}`.
@@ -884,7 +884,7 @@ You can scan the **QR** displayed from the KeyChain mobile app.
 
 When making the transfer **Confirm**.
 
-The receiving user will be notified about the escrow of the funds. 
+The receiving user will be notified about it. 
 
 You have the possibility to **Cancel** the order if you have not made the deposit.
 """
@@ -1058,7 +1058,7 @@ Order `{orderid}`
 
 The security deposit has been made in `{receptor}` correctly.
 
-Contact the telegram user @`{sender}` [->link](https://t.me/{sender}) to specify the shipping details.
+Contact the telegram user @`{sender}` [->link](https://t.me/{sender}) to specify the payment details.
 If it takes more than 3 hours after this notification @`{sender}` you can make a dispute and
 request the cancellation of the operation. In this case we will contact you to guarantee that you have not sent yet 
 the funds.
@@ -1106,7 +1106,7 @@ Esta orden    `{orderid}` ya fue completada, en caso de problema realice una dis
 """
                 else:
                     msg = f"""
-Existe un error en la  `{orderid}` realice una disputa para verificar y resolver el problema.
+Existe un error en la  `{orderid}`, realice una disputa para verificar y resolver el problema.
 """
                 await update.message.reply_markdown(msg, reply_markup=reply_markup)
             else:
@@ -1119,7 +1119,7 @@ This order `{orderid}` has already been completed, in case of problem make a dis
 """
                 else:
                     msg = f"""
-There is an error in the `{orderid}` perform a dispute to verify and resolve the issue.
+There is an error in the `{orderid}`, perform a dispute to verify and resolve the issue.
 """
                 await update.message.reply_markdown(msg, reply_markup=reply_markup)
 
@@ -1138,8 +1138,8 @@ async def fiatsend(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: li
     xchatid, xhiveuser = await dmr.getUserchatid(username)
 
     if xhiveuser == None or xhiveuser == '':
-        msg = {'es': 'Debe registrar primero su usuario de HIVE con /hiveuser nombreusuario',
-               'en': 'You must first register your HIVE user with /hiveuser username'}
+        msg = {'es': 'Debe registrar primero su usuario de HIVE con: /hiveuser nombreusuario',
+               'en': 'You must first register your HIVE user with: /hiveuser username'}
         await update.message.reply_text(msg.get(scode))
         return None
 
@@ -1193,7 +1193,7 @@ Verify that you have received the agreed upon amount of:
 Using the payment method  {pmethod}
 
 Once everything is correct, release the funds. 
-*Important* Once executed this action cannot be undone.
+*Important* Once executed this action, it cannot be undone.
 
 In case of problems or excessive delay make a dispute.
 """
@@ -1291,7 +1291,7 @@ async def listorders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     rows = await dmr.getOrderlist(username)
     if rows == None or len(rows) == 0:
         msg = {'es': "No tiene órdenes activas ",
-               'en': "He has no active orders"}
+                'en': "There is no active orders"}
         await update.message.reply_text(msg.get(scode))
         return None
     if scode == 'es':

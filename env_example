@@ -2,6 +2,7 @@
 export hcbtoken=YOUR_BOT_TOKEN
 export hcburl=https://t.me/YOUR_BOT_USERNAME
 
+
 #HIVESQL
 export hivesqlserver=vip.hivesql.io 
 export hivesqldb=DBHive
@@ -10,6 +11,8 @@ export hivesqlpsw=YOUR_HIVESQL_PASSWD
 
 #TELEGRAM PUBLIC OFFERT CHANNEL YOUR_BOT_USERNAME must be admin
 export hcbchat=@YOUR_TELEGRAM_OFFERT_CHANNEL
+#TELEGRAM PUBLIC SUPPORT CHAT GROUP YOUR_BOT_USERNAME must be admin
+export hcbsup=https://t.me/YOUR_SUPPORT_GROUP
 
 
 #HIVE BOT ACCOUNT 

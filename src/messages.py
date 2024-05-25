@@ -1,4 +1,4 @@
-from config import manager,boturl
+from config import manager,boturl,hcbsup
 
 messages_about = {'es': rf"""
 Este es un bot para la publicación y gestión de ofertas de intercambio P2P en HIVE.
@@ -17,7 +17,7 @@ Utilice los comandos:
 
 Visite el canal de ofertas [Aquí]({boturl})		
 
-
+Si algo sale mal, intente ejecutar /start o comentarnos en nuestro [grupo de soporte]({hcbsup}), recuerde que estamos en proceso de desarrollo.
 
 Gracias!!
 """, 'en': rf"""
@@ -26,24 +26,26 @@ This is a bot for publishing and managing P2P exchange offers on HIVE.
 Use the commands:	
 /start - Restart your user's settings 🟢
 /escrow - Learn about our  escrow system in HIVE 🔄		
-/hiveuser - Register your HIVE user 👤	
-/buy - Place a purchase order 🔺	
-/sell - Place a SELL order 🔻	
+/hiveuser - Register your HIVE username 👤	
+/buy - Place a BUYING order 🔺	
+/sell - Place a SELLING order 🔻		
 /cancel - Delete an order 🔴	
 /listorder - Show the list of active orders 📝	
-/prices -To know about the prices of reference according to Coingecko and yadio.io 📈
-/price -To know the price of one currency using the reference Coingecko and yadio.io 💶
+/prices - Know about the prices of reference according to Coingecko and yadio.io 📈
+/price - Know the price of one currency using the reference Coingecko and yadio.io 💶
 /msg - Send messages to the offers channel (Admins only) 🔐
 
-Visit the offers channel [HERE]({boturl})		
+Visit the offers channel [HERE]({boturl})	
+
+If something goes wrong, try to run /start or comment us in our [support group]({hcbsup}), remember that we are in the process of development.
 
 Thank you!!
 """}
 
-messages_support = {'es': """
- Puede plantear sus dificultades en el [grupo de Soporte](https://t.me/SoporteHiveCubaP2P)
-""", 'en': """
-You can raise your difficulties in the [support group](https://t.me/SoporteHiveCubaP2P)
+messages_support = {'es': f"""
+ Puede plantear sus dificultades en el [grupo de soporte]({hcbsup})
+""", 'en': f"""
+You can raise your difficulties in the [support group]({hcbsup})
 """}
 
 
@@ -61,8 +63,8 @@ messages_registre = {'es': """
 No ha registrado su usuario de HIVE, utilice        
 /hiveuser nombreUsuarioHive 
 """, 'en': """
-You have not registered your HIVE user, please use        
-/hiveuser nameuserhive
+You have not registered your HIVE username, please use        
+/hiveuser hiveusername
 """}
 
 messages_escrow = {'es': """
@@ -91,9 +93,9 @@ Debe registrar su usuario de HIVE para poder operar en nuestro bot:
 /hiveuser nombreUsuarioHive            
 Además, si ha delegado al menos 50 HP a la cuenta  `{manager}` disfrutará cero comisiones.   
 """,'en':"""
-You must register your HIVE user in order to operate on our bot:  
-/hiveuser nameuserhive            
-In addition, if you have delegated at least 50 HP to our  account `{manager}` you will enjoy zero commissions.
+You must register your HIVE username in order to operate on our bot:  
+/hiveuser hiveusername              
+In addition, if you have delegated at least 50 HP to the `{manager}` account you can enjoy zero fees.
 """}
 
 
