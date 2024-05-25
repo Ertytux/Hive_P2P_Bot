@@ -1,4 +1,4 @@
-from config import manager,boturl,hcbsup
+from config import manager,hcbchatid,hcbsup
 
 messages_about = {'es': rf"""
 Este es un bot para la publicación y gestión de ofertas de intercambio P2P en HIVE.
@@ -15,7 +15,7 @@ Utilice los comandos:
 /price -Conocer el precio de una moneda usando de referencia  Coingecko y yadio.io 💶
 /msg -Enviar mensajes al canal de ofertas (Solo Admins) 🔐
 
-Visite el canal de ofertas [Aquí]({boturl})		
+Visite el canal de ofertas {hcbchatid}		
 
 Si algo sale mal, intente ejecutar /start o comentarnos en nuestro [grupo de soporte]({hcbsup}), recuerde que estamos en proceso de desarrollo.
 
@@ -35,7 +35,7 @@ Use the commands:
 /price - Know the price of one currency using the reference Coingecko and yadio.io 💶
 /msg - Send messages to the offers channel (Admins only) 🔐
 
-Visit the offers channel [HERE]({boturl})	
+Visit the offers channel {hcbchatid}		
 
 If something goes wrong, try to run /start or comment us in our [support group]({hcbsup}), remember that we are in the process of development.
 
