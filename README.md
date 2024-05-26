@@ -97,7 +97,7 @@ export bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
 ## Donations
 You can donate to our project using HIVE or HBD with the account `hivecuba.p2p` with the memo `Donate` or using bitcoin lighting to the account `hivecuba.p2p@sats.v4v.app`. 
 
-![QR](https://api.v4v.app/p/hivecuba.p2p.png)
+![QR](https://api.v4v.app/p/hivecuba.p2p.png?cache_flush=false&currency=sats)
 
 Thank you very much in advance!!
 
