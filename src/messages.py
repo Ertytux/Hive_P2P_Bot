@@ -103,7 +103,7 @@ Nuestra comisión es del {fpp*100:.2f}% sobre el monto transferido, más:
 * {fhbd} para HBD
 * {fhive} para HIVE
 
-Este se alade al monto a transferir si usted envía o se descuenta si usted recibe.
+Este se añade al monto a transferir si usted envía o se descuenta si usted recibe.
 
 Si usted delega al menos 50 HP a `{manager}` no tiene que preocuparse por comisiones 😁
 
