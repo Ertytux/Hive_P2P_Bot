@@ -13,11 +13,10 @@ import pymssql
 
 
 from config import (hivesqldb, hivesqlpsw, hivesqlserver,
-                    hivesqluser, fhbd, fhive, receptor, manager, activekey)
+                    hivesqluser, fhbd, fhive,fpp, receptor, manager, activekey)
 
 hive = Hive()
-fhbd = 0.05
-fhive = 0.17
+
 
 
 async def connectMs(SQLCommand, limit):
@@ -73,9 +72,9 @@ async def getFee(userx: str, token: str, amoun: float) -> float:
     # return fee
     if veryfyHiveUser(user_hiveuser) != 1:
         if token.upper() == 'HBD':
-            fee = 3e-3*amoun + fhbd
+            fee = fpp*amoun + fhbd
         if token.upper() == 'HIVE':
-            fee = 3e-3*amoun + fhive
+            fee = fpp*amoun + fhive
     return fee
 
 

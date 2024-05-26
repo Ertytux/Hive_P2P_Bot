@@ -1,4 +1,4 @@
-from config import manager,hcbchatid,hcbsup
+from config import manager,hcbchatid,hcbsup,fpp,fhive,fhbd
 
 messages_about = {'es': rf"""
 Este es un bot para la publicación y gestión de ofertas de intercambio P2P en HIVE.
@@ -97,5 +97,27 @@ You must register your HIVE username in order to operate on our bot:
 /hiveuser hiveusername              
 In addition, if you have delegated at least 50 HP to the `{manager}` account you can enjoy zero fees.
 """}
+
+messages_fees={'es':rf"""
+Nuestra comisión es del {fpp*100:.2f}% sobre el monto transferido, más:
+* {fhbd} para HBD
+* {fhive} para HIVE
+
+Este se alade al monto a transferir si usted envía o se descuenta si usted recibe.
+
+Si usted delega al menos 50 HP a `{manager}` no tiene que preocuparse por comisiones 😁
+
+""",
+'':rf"""
+Our commission is from the {fpp*100:.2f}% on the amount transferred, plus:
+* {fhbd} for HBD
+* {fhive} for HIVE
+
+This is added to the amount to be transferred if you send or discounted if you receive.
+
+If you have delegated at least 50 HP to the `{manager}` account you can enjoy zero fees 😁
+"""}
+
+
 
 

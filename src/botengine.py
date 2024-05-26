@@ -47,6 +47,16 @@ async def escrow(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_markdown(messages_escrow.get(scode))
 # OKX
 
+async def fees(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /fees
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:
+        await update.message.reply_markdown(messages_fees.get(scode))
+# OKX
+
 
 async def prices(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # /prices

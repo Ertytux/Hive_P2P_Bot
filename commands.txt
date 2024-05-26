@@ -6,6 +6,7 @@ buy -Place a purchase order
 sell -Place a sales order
 cancel -Delete an order
 listorder -Show the list of active orders
+fees -Know the service fees
 prices -Know the reference prices according to Coingecko and yadio.io
 price -To know the price of a currency using Coingecko as a reference and yadio.io
 msg -Send messages to the offers channel (Admins only)

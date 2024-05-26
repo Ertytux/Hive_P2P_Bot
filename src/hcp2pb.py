@@ -1,7 +1,8 @@
 
 from botengine import (start, escrow, prices, price, userinfo, hiveuser, msg,
                        buy, sell, cancel, listorders, notify, button, orderClean,
-                       setdailyOrderClean, stopdailyOrderClean, release, back, orderinfo)
+                       setdailyOrderClean, stopdailyOrderClean, release, back, 
+                       orderinfo,fees)
 
 from config import hcbtoken
 
@@ -65,6 +66,7 @@ def main() -> None:
     application.add_handler(CommandHandler("sell", sell))
     application.add_handler(CommandHandler("cancel", cancel))
     application.add_handler(CommandHandler("listorder", listorders))
+    application.add_handler(CommandHandler("fees", fees))
     application.add_handler(CommandHandler("prices", prices))
     application.add_handler(CommandHandler("price", price))
     application.add_handler(CallbackQueryHandler(button))
