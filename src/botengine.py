@@ -1017,7 +1017,7 @@ async def hivesend(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: li
             fee = await getFee(receiver, tokeni, amouni)
             if scode == 'es':
                 keyboard = [[InlineKeyboardButton(
-                    "Confirmar pago", url=f"{boturl}?start=fiatsend_{orderid}_{username}")]]
+                    "Confirmar pago", url=f"{boturl}?start=fiatsend_{orderid}")]]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 rmsg = f"""
 Orden `{orderid}`
@@ -1061,7 +1061,7 @@ Si ocurre una demora excesiva (espere al menos 3 horas), problema o un pago fuer
                                                reply_markup=reply_markup)
             else:
                 keyboard = [[InlineKeyboardButton(
-                    "Confirm payment", url=f"{boturl}?start=fiatsend_{orderid}_{username}")]]
+                    "Confirm payment", url=f"{boturl}?start=fiatsend_{orderid}")]]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 rmsg = f"""
 Order `{orderid}`
@@ -1154,7 +1154,10 @@ async def fiatsend(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: li
         return None
 
     orderid = stext[1]
-    sender = stext[2]
+    (owner, stype, amouni, tokeni, amouno, tokeno,
+                pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
+    sender = owner if stype == 'sell' else taker
+
     status = await dmr.getOrderstatus(orderid)
     if status == 'payed':
         chatid_s, hiveuser_s = await dmr.getUserchatid(sender)
