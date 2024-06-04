@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Activate local python env
-source ./env/bin/activate
+source ./venv/bin/activate
 # Load data
 source ./env_example
 
