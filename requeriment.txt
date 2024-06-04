@@ -30,7 +30,7 @@ pycryptodomex==3.20.0
 pymssql==2.2.11
 pypng==0.20220715.0
 python-dateutil==2.9.0.post0
-python-telegram-bot==21.0.1
+python-telegram-bot==21.2
 pytz==2023.3.post1
 qrcode==7.4.2
 requests==2.31.0
