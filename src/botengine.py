@@ -1,623 +1,43 @@
 # from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ForceReply, ReplyKeyboardRemove
 # from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
-
-from config import hcbchatid, blacklist, admins, supports, boturl, hcbchatid, receptor, manager
+import os
 import datetime
-from tools import is_number, getHoursfromDate
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes
-# , ConversationHandler
-# import asyncio
 import qrcode
-
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, MenuButton
+from telegram.ext import ContextTypes
+from config import (hcbchatid, blacklist, admins,
+                    supports, boturl, hcbchatid, receptor,
+                    manager, tokenAcepted)
+from getlang import getlang
+from tools import getHoursfromDate, is_number
 from genid import getIdfromHash
-from verifyhive import veryfyHiveUser, verifytransact, sendHive, getFee, encodeTrans, reputationHiveUser
+from verifyhive import (veryfyHiveUser, verifytransact,
+                        sendHive, getFee, encodeTrans,
+                        beem_reputationHiveUser)
 import dbmanager as dmr
 from messages import *
 import rates as rt
-import os
 
-
-tokenAcepted = ['HIVE', 'HBD']
 squence = ['amouni', 'tokeni', 'amouno', 'tokeno', 'pmetod']
-
-
-# Communities
-communities = {'mycomm': hcbchatid}
-
-# Lang
-slang = ['es', 'en']
-
-
-def getlang(scode: str) -> str:
-    if scode in slang:
-        return scode
-    return 'en'
-
-# commands
-
-
-async def escrow(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /escrow
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-    else:
-        await update.message.reply_markdown(messages_escrow.get(scode))
-# OKX
-
-async def fees(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /fees
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-    else:
-        await update.message.reply_markdown(messages_fees.get(scode))
-# OKX
-
-
-async def prices(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /prices
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-    else:
-        await update.message.reply_text(rt.getPrices())
-# OKX
-
-
-async def price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /price
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    stext = update.message.text.split()
-    if len(stext) < 2:
-        msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /price VES ',
-               'en': 'Incorrect command, it must be for example: /price GHS '}
-        await update.message.reply_text(msg.get(scode))
-        return None
-    await update.message.reply_text(rt.getPrice(stext[1]))
-# OKX
-
-
-async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /userinfo
-    user = update.effective_user
-    chatid = update.message.chat_id
-    scode = getlang(user.language_code)
-    if chatid in blacklist:
-        msg = {'es': 'Usuario restringido',
-               'en': 'Restricted user'}
-        await update.message.reply_text(msg.get(scode))
-        return None
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    else:
-        username = user.username.lower()
-        data = await dmr.getUserInfo(username)
-        if scode == 'es':
-            msg = rf"""
-**Usuario de Telegram**: `{username}` [link](https://t.me/{username})
-**Usuario de HIVE**: `{data.get('hiveuser')}`
-**Delega a** `{manager}`: {'Si' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
-**Número de órdenes completadas**: `{data.get('norders')}`
-**Reputación en HIVE**: `{await reputationHiveUser(data.get('hiveuser')):.2f}`
-"""
-        else:
-            msg = rf"""
-**Telegram user**: `{username}` [link](https://t.me/{username})
-**HIVE user**: `{data.get('hiveuser')}`
-** Delegate to** `{manager}`: {'Yes' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
-**Number of completed orders**: `{data.get('norders')}`
-**Reputation on HIVE**: `{await reputationHiveUser(data.get('hiveuser')):.2f}`
-"""
-        await update.message.reply_markdown(msg)
-# OKX
-
-
-async def hiveuser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /hiveuser
-    user = update.effective_user
-    chatid = update.message.chat_id
-    scode = getlang(user.language_code)
-    if chatid in blacklist:
-        msg = {'es': 'Usuario restringido',
-               'en': 'Restricted user'}
-        await update.message.reply_text(msg.get(scode))
-        return None
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-    else:
-        username = user.username.lower()
-        stext = update.message.text.split()
-        if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /hiveuser juanperes ',
-                   'en': 'Incorrect command, must be for example: /hiveuser juanperes '}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        hiveU = stext[1].lower()
-        status = veryfyHiveUser(hiveU)
-        await dmr.setUserhiveuser(username, hiveU, status)
-        if status:
-            msg = {'es': f"Usuario {hiveU} registrado correctamente, gracias por apoyar a `{manager}`",
-                   'en': f"User {hiveU} is now successfully registered, thank you for supporting `{manager}`"}
-            await update.message.reply_markdown(msg.get(scode))
-        else:
-            msg = {'es': f"Usuario {hiveU} registrado correctamente, delegue al menos 50 HP a `{manager}` para disfrutar cero comisiones",
-                   'en': f"User {hiveU} is now registered correctly, delegate at least 50 HP to `{manager}` to enjoy zero commissions"}
-            await update.message.reply_markdown(msg.get(scode))
-            await update.message.reply_markdown(messages_notHP.get(scode))
-# OKX
-
-
-async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /msg
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    else:
-        username = user.username.lower()
-        stext = update.message.text.split()
-        if username not in admins:
-            msg = {'es': "Usted no tiene permisos para enviar mensajes al canal",
-                   'en': "You don't have permissions to send messages to the channel"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /msg mensaje ',
-                   'en': 'Incorrect command, must be for example: /msg message '}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        sent_message = await context.bot.send_message(chat_id=hcbchatid, text=str.join(" ", stext[1:]))
-        msout = {'es': f"""
-Link del mensaje publicado https://t.me/{sent_message.chat.username}/{sent_message.message_id}              
-        """, 'en': f"""
-Link of the published message https://t.me/{sent_message.chat.username}/{sent_message.message_id}              
-        """}
-        await update.message.reply_markdown(msout.get(scode))
-# OKX
-
-
-async def release(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /release
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    else:
-        username = user.username.lower()
-
-        if username not in admins:
-            msg = {'es': "Usted no tiene permisos",
-                   'en': "You don't have permissions"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        stext = update.message.text.split()
-
-        if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /release 34564564576445234563 ',
-                   'en': 'Incorrect command, must be for example: /release 34564564576445234563 '}
-            await update.message.reply_text(msg.get(scode))
-            return None
-
-        orderid = stext[1]
-        (owner, stype, amouni, tokeni, amouno, tokeno,
-         pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
-
-    # sell default
-
-        receiver = taker
-        if stype == 'buy':
-            receiver = owner
-
-        chatid_r, hiveuser_r = await dmr.getUserchatid(receiver)
-
-        if dstatus == 'finish':
-            msg = {'es': f"Esta orden {orderid} ya fue completada",
-                   'en': f"This order {orderid} has been completed"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-
-        if dstatus == 'payed':
-            fee = await getFee(receiver, tokeni, amouni)
-            sendHive(hiveuser_r, amouni-fee, tokeni)
-            await dmr.setOrderfinish(orderid)
-            await dmr.incremetUserordercount(receiver)
-            msg = {'es': f"Orden {orderid} completada",
-                   'en': f"Order {orderid} completed"}
-            await context.bot.send_message(chat_id=chatid_r, text=msg.get(scode))
-
-        else:
-            msg = {'es': f"Error en orden {orderid} contacte a soporte.",
-                   'en': f"Error in order {orderid} contact support."}
-            await update.message.reply_text(msg.get(scode))
-# ok
-
-
-async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    else:
-        username = user.username.lower()
-
-        if username not in admins:
-            msg = {'es': "Usted no tiene permisos",
-                   'en': "You don't have permissions"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        stext = update.message.text.split()
-
-        if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /back 34564564576445234563 ',
-                   'en': 'Incorrect command, must be for example: /back 34564564576445234563 '}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        orderid = stext[1]
-        (owner, stype, amouni, tokeni, amouno, tokeno,
-         pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
-        if dstatus == 'payed':
-            sender = owner
-            if stype == 'buy':
-                sender = taker
-            chatid_s, hiveuser_s = await dmr.getUserchatid(sender)
-
-            await scancel(update, context, stext)
-            try:
-                fee = await getFee(sender, tokeni, amouni)
-                sendHive(hiveuser_s, amouni-fee, tokeni)
-                await update.message.reply_text(
-                    rf"{amouni-fee:.3f} {tokeni} send to {hiveuser_s}->{sender}")
-            except:
-                await update.message.reply_text("Parameters Error, verify on HIVE!!")
-        else:
-            await update.message.reply_text("Error, Order not Payed!!")
-
-
-async def orderinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    else:
-        username = user.username.lower()
-
-        if username not in admins:
-            msg = {'es': "Usted no tiene permisos",
-                   'en': "You don't have permissions"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        stext = update.message.text.split()
-
-        if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /orderinfo 34564564576445234563 ',
-                   'en': 'Incorrect command, must be for example: /orderinfo 34564564576445234563 '}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        orderid = stext[1]
-        (owner, stype, amouni, tokeni, amouno, tokeno,
-         pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
-        msg = {'es': rf"""
-Datos de la orden {orderid}:
-[(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)]  
-{(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)}  
-""", 'en': rf"""
-Order data {orderid}:
-[(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)]  
-{(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)}  
-"""}
-        await update.message.reply_text(msg.get(scode))
-
-
-async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /notify
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    else:
-        username = user.username.lower()
-        if username not in admins:
-            msg = {'es': "Usted no tiene permisos para enviar mensajes al canal",
-                   'en': "You don't have permissions to send messages to the channel"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        stext = update.message.text.split()
-        uchatid = update.message.chat_id
-        if len(stext) < 2:
-            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /notify mensaje ',
-                   'en': 'Incorrect command, must be for example: /notify message '}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        chat_ids = await dmr.getUsersChats()
-        msg = str.join(" ", stext[1:])
-        for rx in chat_ids:
-            chat_idr = rx[0]
-            if rx != None:
-                if uchatid != int(chat_idr):
-                    try:
-                        await context.bot.send_message(chat_id=int(chat_idr), text=msg)
-                    except:
-                        continue
-        msg = {'es': f"Mensaje enviado a {len(chat_ids)} usuarios.",
-               'en': f"Message sent to {len(chat_ids)} users."}
-        await update.message.reply_text(msg.get(scode))
-# OKX
-
-
-async def setorder(stype: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # Set ORDER
-    user = update.effective_user
-    chatid = update.message.chat_id
-    scode = getlang(user.language_code)
-    if chatid in blacklist:
-        msg = {'es': 'Usuario restringido',
-               'en': 'Restricted user'}
-        await update.message.reply_text(msg.get(scode))
-        return None
-
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
-        return None
-    username = user.username.lower()
-    xchatid, xhiveuser = await dmr.getUserchatid(username)
-
-    if xhiveuser == None or xhiveuser == '':
-        await update.message.reply_text(messages_notSt.get(scode))
-        return None
-
-    mtext = update.message.text
-    if '@' in mtext:
-        msgN = {'es': "No se admite una orden que revele explícitamente el nombre de usuario.",
-                'en': "An order that explicitly reveals the user name is not allowed."}
-        await update.message.reply_text(msgN.get(scode))
-        return None
-
-    stext = mtext.split()
-    if not len(stext) < 5:
-        if not is_number(stext[1]):
-            msg = {'es': "Formato de monto de entrada incorrecto",
-                   'en': "Incorrect input amount format"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        amounI = float(stext[1])
-        tokenI: str = stext[2]
-        if tokenI.upper() not in tokenAcepted:
-            errms = {'es': f"""
-Solo se aceptan los siguientes tokens:  
-{tokenAcepted}
-""", 'en': f"""
-Only the following tokens are accepted:  
-{tokenAcepted}
-"""}
-            await update.message.reply_markdown(errms.get(scode))
-            return None
-
-        if not is_number(stext[3]):
-            msg = {'es': "Formato de monto de salida incorrecto",
-                   'en': "Incorrect output amount format"}
-            await update.message.reply_text(msg.get(scode))
-            return None
-        amounO = float(stext[3])
-        tokenO: str = stext[4]
-        pmethod: str = str.join(" ", stext[5:])
-        if scode == 'es':
-            rtype = "🟢 #COMPRA"
-            if stype == "sell":
-                rtype = "🔴 #VENTA"
-            ormsg = rf"""
-{rtype} 
-
-💰 {amounI} #{tokenI.upper()} **por** {amounO} #{tokenO.upper()}        
-💹 Tasa de cambio: {(amounO/amounI):.3f}             
-🏧 Medio de pago: {pmethod}           
-
-Cuenta garante: @`{receptor}`
-
-Datos del ofertante:
-🔁 Operaciones terminadas: {await dmr.getUserNorder(username)}  
-🎖 Reputación en HIVE: {await reputationHiveUser(xhiveuser):.2f}   
-"""
-#
-            idx = getIdfromHash(ormsg)
-
-        # ormsg = ormsg+"\n" + \
-        #    f"Tomar orden `{idx}` [AQUI]()     "
-            keyboard = [[InlineKeyboardButton(
-                f"Tomar orden {idx}", url=f"{boturl}?start=take_{idx}")]]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            sent_message = await context.bot.send_message(chat_id=hcbchatid, text=ormsg, parse_mode='Markdown', reply_markup=reply_markup)
-            chatlink = f"https://t.me/{sent_message.chat.username}/{sent_message.message_id}"
-            status = "nuevo"
-            await dmr.setOrder(idx, username, stype, amounI, tokenI, amounO, tokenO, pmethod, chatlink, status)
-            msout = f"""
-Oferta `{idx}` 
-Publicada en {chatlink} 
-
-Puede cancelarla **si aún no ha sido tomada**.  
-
-🚨 Una vez tomada **solo la parte que envía HIVE o HBD** podrá cancelar la orden y la otra parte podrá
-abrir una disputa.            
-"""
-            keyboard = [[InlineKeyboardButton(
-                f"Cancelar orden {idx}", url=f"{boturl}?start=cancel_{idx}")]]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.message.reply_markdown(msout, reply_markup=reply_markup)
-        else:  # EN
-            rtype = "🟢 #BUY"
-            if stype == "sell":
-                rtype = "🔴 #SELL"
-            ormsg = rf"""
-{rtype} 
-
-💰 {amounI} #{tokenI.upper()} **by** {amounO} #{tokenO.upper()}        
-💹 Exchange rate: {(amounO/amounI):.3f}             
-🏧 Means of payment: {pmethod}           
-
-Guarantor account: @`{receptor}`
-
-Details of the bidder:
-🔁 Completed operations: {await dmr.getUserNorder(username)}  
-🎖 Reputation in HIVE: {await reputationHiveUser(username):.2f}   
-"""
-#
-            idx = getIdfromHash(ormsg)
-
-        # ormsg = ormsg+"\n" + \
-        #    f"Tomar orden `{idx}` [AQUI]()     "
-            keyboard = [[InlineKeyboardButton(
-                f"Take order {idx}", url=f"{boturl}?start=take_{idx}")]]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            sent_message = await context.bot.send_message(chat_id=hcbchatid, text=ormsg, parse_mode='Markdown', reply_markup=reply_markup)
-            chatlink = f"https://t.me/{sent_message.chat.username}/{sent_message.message_id}"
-            status = "nuevo"
-            await dmr.setOrder(idx, username, stype, amounI, tokenI, amounO, tokenO, pmethod, chatlink, status)
-            msout = f"""
-Offer `{idx}` 
-Published in {chatlink} 
-
-You can cancel it ** if it hasn't been taken yet**.
-
-🚨 Once taken **only the party sending HIVE or HBD** will be able to cancel the order, and the other party will
-open a dispute.           
-"""
-            keyboard = [[InlineKeyboardButton(
-                f"Cancel order {idx}", url=f"{boturl}?start=cancel_{idx}")]]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.message.reply_markdown(msout, reply_markup=reply_markup)
-
-    else:
-        errms = {'es': f"""
-Comando incorrecto debe ser por ejemplo: 
-/{stype} 10 HBD 3000 CUP Trasfermóvil o Enzona
-""", 'en': f"""
-Incorrect command must be for example: 
-/{stype} 10 HBD 3000 CUP Transfermobile or Enzone
-"""}
-        await update.message.reply_text(errms.get(scode))
- # OKX
-
-
-async def buy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /buy
-    stype = "buy"
-    await setorder(stype, update, context)
-# OKX
-
-
-async def sell(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /sell
-    stype = "sell"
-    await setorder(stype, update, context)
-# OKX
-
-
-async def scancel(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: list) -> None:
-    # /cancel
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    username = user.username.lower()
-    if len(stext) < 2:
-        msg = {'es': "Comando incorrecto, utilice por ejemplo: /cancel 3453453626423413423",
-               'en': "Incorrect command, use for example: /cancel 3453453626423413423"}
-        await update.message.reply_text(msg.get(scode))
-        return None
-    orderid = stext[1]
-    (owner, stype, amouni, tokeni, amouno, tokeno,
-        pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
-    if dstatus == 'cancel':
-        msg = {'es': f"La orden `{orderid}` ya ha sido cancelada con anterioridad a su acción.",
-               'en': f"The `{orderid}` order has already been cancelled prior to your action."}
-        await update.message.reply_markdown(msg.get(scode))
-        return None
-    if dstatus == 'finish':
-        msg = {'es': f"""
-No se puede cancelar una orden *finalizada*.
-""", 'en': f"""
-A *completed* order cannot be cancelled.
-"""}
-        await update.message.reply_markdown(msg.get(scode))
-        return None
-    owner_id, owner_hive = await dmr.getUserchatid(owner)
-    skk = int(chatlink.split("/").pop()) if chatlink != '' else None
-
-    if username in admins:
-        await dmr.cancelOrder(orderid)
-        try:
-            await context.bot.delete_message(chat_id=hcbchatid, message_id=skk)
-            msg = {'es': f"Orden  {orderid} eliminada correctamente",
-                   'en': f"Order {orderid} successfully deleted"}
-            await update.message.reply_text(msg.get(scode))
-        except:
-            msg = {'es': f"""
-Orden  {orderid} eliminada.
-Elimine el enlace -> {chatlink} -- mensaje {skk} manualmente""",
-                   'en': f"""
-Order {orderid} removed.
-Delete the link -> {chatlink} -- message {skk} manually"""}
-            await update.message.reply_text(msg.get(scode))
-        msg = {'es': f"Orden {orderid} cancelada por un administrador",
-               'en': f"Order {orderid} cancelled by an administrator"}
-        await context.bot.send_message(chat_id=owner_id, text=msg.get(scode))
-        if dstatus != 'nuevo':
-            taker_id, taker_hive = await dmr.getUserchatid(taker)
-            await context.bot.send_message(chat_id=taker_id, text=msg.get(scode))
-        return None
-
-    if dstatus == 'nuevo' and username == owner:
-        await dmr.cancelOrder(orderid)
-        if chatlink != '':
-            await context.bot.delete_message(chat_id=hcbchatid, message_id=skk)
-        msg = {'es': f"Orden {orderid} cancelada",
-               'en': f"Order {orderid} cancelled"}
-        await context.bot.send_message(chat_id=owner_id, text=msg.get(scode))
-        return None
-    sender = owner if stype == 'sell' else taker
-    if dstatus == 'tomado' and username == sender:
-        await dmr.cancelOrder(orderid)
-        # if  chatlink!='':
-        # await context.bot.delete_message(chat_id=hcbchatid, message_id=skk)
-        taker_id, taker_hive = await dmr.getUserchatid(taker)
-        msg = {'es': f"Orden {orderid} cancelada pues no se hará el depósito en garantía.",
-               'en': f"Order {orderid} cancelled as the security deposit will not be made."}
-        await context.bot.send_message(chat_id=owner_id, text=msg.get(scode))
-        await context.bot.send_message(chat_id=taker_id, text=msg.get(scode))
-        return None
-    msg = {'es': f"Usted no puede cancelar la orden  {orderid}.",
-           'en': f"You cannot cancel the {orderid} order."}
-    await update.message.reply_text(msg.get(scode))
-# OK
-
-
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU)
-    else:
-        stext = update.message.text.split()
-        await scancel(update, context, stext)
 
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
+   
     query = update.callback_query
     await query.answer()
     if query.data == "_Erase_":
-        await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.effective_message.id)
+        await context.bot.delete_message(chat_id=update.effective_chat.id, 
+                                         message_id=update.effective_message.id)
+        await context.user_data.clear()
+        return None
+    if query.data == "_help_":
+        await context.bot.delete_message(chat_id=update.effective_chat.id, 
+                                         message_id=update.effective_message.id)                
+        return None
+    if query.data == "_into_":
+        await context.bot.delete_message(chat_id=update.effective_chat.id, 
+                                         message_id=update.effective_message.id)        
         return None
     return None
 
@@ -1155,7 +575,7 @@ async def fiatsend(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: li
 
     orderid = stext[1]
     (owner, stype, amouni, tokeni, amouno, tokeno,
-                pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
+     pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
     sender = owner if stype == 'sell' else taker
 
     status = await dmr.getOrderstatus(orderid)
@@ -1292,81 +712,143 @@ Order data:
         await update.message.reply_text(msg.get(scode))
 # OKX
 
-
-async def listorders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /listorders
-    user = update.effective_user
-    scode = getlang(user.language_code)
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU)
-        return None
-    username = user.username.lower()
-    rows = await dmr.getOrderlist(username)
-    if rows == None or len(rows) == 0:
-        msg = {'es': "No tiene órdenes activas ",
-                'en': "There is no active orders"}
-        await update.message.reply_text(msg.get(scode))
-        return None
-    if scode == 'es':
-        ordermsg = """
-Listado de órdenes activas: 
-"""
-        for element in rows:
-            action = ""
-            if element[1] == "nuevo":
-                action = f"[cancelar]({boturl}?start=cancel_{element[0]}"
-            ordermsg += f"ID:`{element[0]}` Estado: {element[1]} {action} \n"
-    else:  # EN
-        ordermsg = """
-List of active orders:
-"""
-        for element in rows:
-            action = ""
-            if element[1] == "nuevo":
-                action = f"[cancel]({boturl}?start=cancel_{element[0]}"
-            ordermsg += f"ID:`{element[0]}` State: {element[1]} {action} \n"
-
-    await update.message.reply_markdown(ordermsg)
-# OKX
+# ---------------------------------------
+# Main Commands
+# ---------------------------------------
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /start
+async def orderinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     scode = getlang(user.language_code)
     if user.username == '' or user.username == None:
         await update.message.reply_markdown(messages_statU.get(scode))
+        return None
     else:
         username = user.username.lower()
-        chatid = update.message.chat_id
+
+        if username not in admins:
+            msg = {'es': "Usted no tiene permisos",
+                   'en': "You don't have permissions"}
+            await update.message.reply_text(msg.get(scode))
+            return None
         stext = update.message.text.split()
-        if len(stext) == 1:
-            await update.message.reply_html(
-                rf"Hola {user.mention_html()}!",)
-            await update.message.reply_markdown(messages_about.get(scode))
-            if not await dmr.checkUser(username):
-                await dmr.setUserchatid(username, chatid)
+
+        if len(stext) < 2:
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /orderinfo 34564564576445234563 ',
+                   'en': 'Incorrect command, must be for example: /orderinfo 34564564576445234563 '}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        orderid = stext[1]
+        (owner, stype, amouni, tokeni, amouno, tokeno,
+         pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
+        msg = {'es': rf"""
+Datos de la orden {orderid}:
+[(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)]  
+{(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)}  
+""", 'en': rf"""
+Order data {orderid}:
+[(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)]  
+{(owner, stype, amouni, tokeni, amouno, tokeno, pmethod, taker, chatlink, dstatus, order_date)}  
+"""}
+        await update.message.reply_text(msg.get(scode))
+
+
+async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    else:
+        username = user.username.lower()
+
+        if username not in admins:
+            msg = {'es': "Usted no tiene permisos",
+                   'en': "You don't have permissions"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        stext = update.message.text.split()
+
+        if len(stext) < 2:
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /back 34564564576445234563 ',
+                   'en': 'Incorrect command, must be for example: /back 34564564576445234563 '}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        orderid = stext[1]
+        (owner, stype, amouni, tokeni, amouno, tokeno,
+         pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
+        if dstatus == 'payed':
+            sender = owner
+            if stype == 'buy':
+                sender = taker
+            chatid_s, hiveuser_s = await dmr.getUserchatid(sender)
+
+            await scancel(update, context, stext)
+            try:
+                fee = await getFee(sender, tokeni, amouni)
+                sendHive(hiveuser_s, amouni-fee, tokeni)
+                await update.message.reply_text(
+                    rf"{amouni-fee:.3f} {tokeni} send to {hiveuser_s}->{sender}")
+            except:
+                await update.message.reply_text("Parameters Error, verify on HIVE!!")
         else:
-            textstruct = stext[1].split('_')
-            command = textstruct[0]
-            match command:
-                case 'cancel':
-                    await scancel(update, context, textstruct)
-                case 'take':
-                    await stake(update, context, textstruct)
-                case 'totake':
-                    await totake(update, context, textstruct)
-                case 'hivesend':
-                    await hivesend(update, context, textstruct)
-                case 'fiatsend':
-                    await fiatsend(update, context, textstruct)
-                case 'finish':
-                    await finish(update, context, textstruct)
-                case 'dispute':
-                    await dispute(update, context, textstruct)
-                case _:
-                    await context.bot.send_message(chat_id=update.effective_chat.id, text="Enlaces de órdenes por implementar")
-            await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
+            await update.message.reply_text("Error, Order not Payed!!")
+
+
+async def release(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /release -Release the funds of a order on dispute to the receiver (Admins only)
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    else:
+        username = user.username.lower()
+
+        if username not in admins:
+            msg = {'es': "Usted no tiene permisos",
+                   'en': "You don't have permissions"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        stext = update.message.text.split()
+
+        if len(stext) < 2:
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /release 34564564576445234563 ',
+                   'en': 'Incorrect command, must be for example: /release 34564564576445234563 '}
+            await update.message.reply_text(msg.get(scode))
+            return None
+
+        orderid = stext[1]
+        (owner, stype, amouni, tokeni, amouno, tokeno,
+         pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
+
+    # sell default
+
+        receiver = taker
+        if stype == 'buy':
+            receiver = owner
+
+        chatid_r, hiveuser_r = await dmr.getUserchatid(receiver)
+
+        if dstatus == 'finish':
+            msg = {'es': f"Esta orden {orderid} ya fue completada",
+                   'en': f"This order {orderid} has been completed"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+
+        if dstatus == 'payed':
+            fee = await getFee(receiver, tokeni, amouni)
+            sendHive(hiveuser_r, amouni-fee, tokeni)
+            await dmr.setOrderfinish(orderid)
+            await dmr.incremetUserordercount(receiver)
+            msg = {'es': f"Orden {orderid} completada",
+                   'en': f"Order {orderid} completed"}
+            await context.bot.send_message(chat_id=chatid_r, text=msg.get(scode))
+
+        else:
+            msg = {'es': f"Error en orden {orderid} contacte a soporte.",
+                   'en': f"Error in order {orderid} contact support."}
+            await update.message.reply_text(msg.get(scode))
 
 
 async def dailyOrderClean(context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1392,6 +874,22 @@ async def dailyOrderClean(context: ContextTypes.DEFAULT_TYPE) -> None:
 # OKX
 
 
+async def stopdailyOrderClean(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU)
+        return None
+    else:
+        username = user.username.lower()
+        if username not in admins:
+            await update.message.reply_text("You do not have permissions to send messages")
+            return None
+        job_queue = context.job_queue
+        job_queue.stop()
+        await update.message.reply_text("Daily order cleaning disabled")
+# DB
+
+
 async def setdailyOrderClean(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     if user.username == '' or user.username == None:
@@ -1406,22 +904,6 @@ async def setdailyOrderClean(update: Update, context: ContextTypes.DEFAULT_TYPE)
         job_queue.run_daily(await dailyOrderClean, time=datetime.time(
             hour=5, minute=0, second=0))
         await update.message.reply_text("Daily order cleaning activated")
-# DB
-
-
-async def stopdailyOrderClean(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU)
-        return None
-    else:
-        username = user.username.lower()
-        if username not in admins:
-            await update.message.reply_text("You do not have permissions to send messages")
-            return None
-        job_queue = context.job_queue
-        job_queue.stop()
-        await update.message.reply_text("Daily order cleaning disabled")
 # DB
 
 
@@ -1461,4 +943,535 @@ async def orderClean(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     rmsg += "\n"
     rmsg += "Cleaning of daily orders carried out"
     await update.message.reply_markdown(rmsg)
+
+
+async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /notify -Send a notification to all users (Admins only)
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    else:
+        username = user.username.lower()
+        if username not in admins:
+            msg = {'es': "Usted no tiene permisos para enviar mensajes al canal",
+                   'en': "You don't have permissions to send messages to the channel"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        stext = update.message.text.split()
+        uchatid = update.message.chat_id
+        if len(stext) < 2:
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /notify mensaje ',
+                   'en': 'Incorrect command, must be for example: /notify message '}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        chat_ids = await dmr.getUsersChats()
+        msg = str.join(" ", stext[1:])
+        for rx in chat_ids:
+            if rx != None:
+                chat_idr = int(rx[0])
+                if uchatid != chat_idr:
+                    try:
+                        await context.bot.send_message(chat_id=chat_idr, text=msg)
+                    except:
+                        continue
+        msg = {'es': f"Mensaje enviado a {len(chat_ids)} usuarios.",
+               'en': f"Message sent to {len(chat_ids)} users."}
+        await update.message.reply_text(msg.get(scode))
+
+
+async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /msg -Send messages to the offers channel (Admins only)
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    else:
+        username = user.username.lower()
+        stext = update.message.text.split()
+        if username not in admins:
+            msg = {'es': "Usted no tiene permisos para enviar mensajes al canal",
+                   'en': "You don't have permissions to send messages to the channel"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        if len(stext) < 2:
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /msg mensaje ',
+                   'en': 'Incorrect command, must be for example: /msg message '}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        sent_message = await context.bot.send_message(chat_id=hcbchatid, text=str.join(" ", stext[1:]))
+        msout = {'es': f"""
+Link del mensaje publicado https://t.me/{sent_message.chat.username}/{sent_message.message_id}              
+        """, 'en': f"""
+Link of the published message https://t.me/{sent_message.chat.username}/{sent_message.message_id}              
+        """}
+        await update.message.reply_markdown(msout.get(scode))
+
+
+async def escrow(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /escrow -Learn about our escrow system at HIVE
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:
+        await update.message.reply_markdown(messages_escrow.get(scode))
+
+
+async def price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /price -To know the price of a currency using Coingecko as a reference and yadio.io
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    stext = update.message.text.split()
+    if len(stext) < 2:
+        msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /price VES ',
+               'en': 'Incorrect command, it must be for example: /price GHS '}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    await update.message.reply_text(rt.getPrice(stext[1]))
 # OKX
+
+
+async def prices(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /prices -Know the reference prices according to Coingecko and yadio.io
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:
+        await update.message.reply_text(rt.getPrices())
+
+
+async def fees(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /fees -Know the service fees
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:
+        await update.message.reply_markdown(messages_fees.get(scode))
+
+
+async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /userinfo
+    user = update.effective_user
+    chatid = update.message.chat_id
+    scode = getlang(user.language_code)
+    if chatid in blacklist:
+        msg = {'es': 'Usuario restringido',
+               'en': 'Restricted user'}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    else:
+        username = user.username.lower()
+        data = await dmr.getUserInfo(username)
+        if scode == 'es':
+            msg = rf"""
+**Usuario de Telegram**: `{username}` [link](https://t.me/{username})
+**Usuario de HIVE**: `{data.get('hiveuser')}`
+**Delega a** `{manager}`: {'Si' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
+**Número de órdenes completadas**: `{data.get('norders')}`
+**Reputación en HIVE**: `{await beem_reputationHiveUser(data.get('hiveuser')):.2f}`
+"""
+        else:
+            msg = rf"""
+**Telegram user**: `{username}` [link](https://t.me/{username})
+**HIVE user**: `{data.get('hiveuser')}`
+** Delegate to** `{manager}`: {'Yes' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
+**Number of completed orders**: `{data.get('norders')}`
+**Reputation on HIVE**: `{await beem_reputationHiveUser(data.get('hiveuser')):.2f}`
+"""
+        await update.message.reply_markdown(msg)
+
+
+async def listorders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /listorders -Show the list of active orders
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU)
+        return None
+    username = user.username.lower()
+    rows = await dmr.getOrderlist(username)
+    if rows == None or len(rows) == 0:
+        msg = {'es': "No tiene órdenes activas ",
+               'en': "There is no active orders"}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    if scode == 'es':
+        ordermsg = """
+Listado de órdenes activas: 
+"""
+        for element in rows:
+            action = ""
+            if element[1] == "nuevo":
+                action = f"[cancelar]({boturl}?start=cancel_{element[0]}"
+            ordermsg += f"ID:`{element[0]}` Estado: {element[1]} {action} \n"
+    else:  # EN
+        ordermsg = """
+List of active orders:
+"""
+        for element in rows:
+            action = ""
+            if element[1] == "nuevo":
+                action = f"[cancel]({boturl}?start=cancel_{element[0]}"
+            ordermsg += f"ID:`{element[0]}` State: {element[1]} {action} \n"
+
+    await update.message.reply_markdown(ordermsg)
+
+
+async def scancel(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: list) -> None:
+    # scancel link order
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    username = user.username.lower()
+    if len(stext) < 2:
+        msg = {'es': "Comando incorrecto, utilice por ejemplo: /cancel 3453453626423413423",
+               'en': "Incorrect command, use for example: /cancel 3453453626423413423"}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    orderid = stext[1]
+    (owner, stype, amouni, tokeni, amouno, tokeno,
+        pmethod, taker, chatlink, dstatus, order_date) = await dmr.getOrderdata(orderid)
+    if dstatus == 'cancel':
+        msg = {'es': f"La orden `{orderid}` ya ha sido cancelada con anterioridad a su acción.",
+               'en': f"The `{orderid}` order has already been cancelled prior to your action."}
+        await update.message.reply_markdown(msg.get(scode))
+        return None
+    if dstatus == 'finish':
+        msg = {'es': f"""
+No se puede cancelar una orden *finalizada*.
+""", 'en': f"""
+A *completed* order cannot be cancelled.
+"""}
+        await update.message.reply_markdown(msg.get(scode))
+        return None
+    owner_id, owner_hive = await dmr.getUserchatid(owner)
+    skk = int(chatlink.split("/").pop()) if chatlink != '' else None
+
+    if username in admins:
+        await dmr.cancelOrder(orderid)
+        try:
+            await context.bot.delete_message(chat_id=hcbchatid, message_id=skk)
+            msg = {'es': f"Orden  {orderid} eliminada correctamente",
+                   'en': f"Order {orderid} successfully deleted"}
+            await update.message.reply_text(msg.get(scode))
+        except:
+            msg = {'es': f"""
+Orden  {orderid} eliminada.
+Elimine el enlace -> {chatlink} -- mensaje {skk} manualmente""",
+                   'en': f"""
+Order {orderid} removed.
+Delete the link -> {chatlink} -- message {skk} manually"""}
+            await update.message.reply_text(msg.get(scode))
+        msg = {'es': f"Orden {orderid} cancelada por un administrador",
+               'en': f"Order {orderid} cancelled by an administrator"}
+        await context.bot.send_message(chat_id=owner_id, text=msg.get(scode))
+        if dstatus != 'nuevo':
+            taker_id, taker_hive = await dmr.getUserchatid(taker)
+            await context.bot.send_message(chat_id=taker_id, text=msg.get(scode))
+        return None
+
+    if dstatus == 'nuevo' and username == owner:
+        await dmr.cancelOrder(orderid)
+        if chatlink != '':
+            await context.bot.delete_message(chat_id=hcbchatid, message_id=skk)
+        msg = {'es': f"Orden {orderid} cancelada",
+               'en': f"Order {orderid} cancelled"}
+        await context.bot.send_message(chat_id=owner_id, text=msg.get(scode))
+        return None
+    sender = owner if stype == 'sell' else taker
+    if dstatus == 'tomado' and username == sender:
+        await dmr.cancelOrder(orderid)
+        # if  chatlink!='':
+        # await context.bot.delete_message(chat_id=hcbchatid, message_id=skk)
+        taker_id, taker_hive = await dmr.getUserchatid(taker)
+        msg = {'es': f"Orden {orderid} cancelada pues no se hará el depósito en garantía.",
+               'en': f"Order {orderid} cancelled as the security deposit will not be made."}
+        await context.bot.send_message(chat_id=owner_id, text=msg.get(scode))
+        await context.bot.send_message(chat_id=taker_id, text=msg.get(scode))
+        return None
+    msg = {'es': f"Usted no puede cancelar la orden  {orderid}.",
+           'en': f"You cannot cancel the {orderid} order."}
+    await update.message.reply_text(msg.get(scode))
+# OK
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /cancel -Delete an orders
+    user = update.effective_user
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU)
+    else:
+        stext = update.message.text.split()
+        await scancel(update, context, stext)
+
+
+async def setorder(stype: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Set ORDER
+    user = update.effective_user
+    chatid = update.message.chat_id
+    scode = getlang(user.language_code)
+    if chatid in blacklist:
+        msg = {'es': 'Usuario restringido',
+               'en': 'Restricted user'}
+        await update.message.reply_text(msg.get(scode))
+        return None
+
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    username = user.username.lower()
+    xchatid, xhiveuser = await dmr.getUserchatid(username)
+
+    if xhiveuser == None or xhiveuser == '':
+        await update.message.reply_text(messages_notSt.get(scode))
+        return None
+
+    mtext = update.message.text
+    if '@' in mtext:
+        msgN = {'es': "No se admite una orden que revele explícitamente el nombre de usuario.",
+                'en': "An order that explicitly reveals the user name is not allowed."}
+        await update.message.reply_text(msgN.get(scode))
+        return None
+
+    stext = mtext.split()
+    if not len(stext) < 5:
+        if not is_number(stext[1]):
+            msg = {'es': "Formato de monto de entrada incorrecto",
+                   'en': "Incorrect input amount format"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        amounI = float(stext[1])
+        tokenI: str = stext[2]
+        if tokenI.upper() not in tokenAcepted:
+            errms = {'es': f"""
+Solo se aceptan los siguientes tokens:  
+{tokenAcepted}
+""", 'en': f"""
+Only the following tokens are accepted:  
+{tokenAcepted}
+"""}
+            await update.message.reply_markdown(errms.get(scode))
+            return None
+
+        if not is_number(stext[3]):
+            msg = {'es': "Formato de monto de salida incorrecto",
+                   'en': "Incorrect output amount format"}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        amounO = float(stext[3])
+        tokenO: str = stext[4]
+        pmethod: str = str.join(" ", stext[5:])
+        if scode == 'es':
+            rtype = "🟢 #COMPRA"
+            if stype == "sell":
+                rtype = "🔴 #VENTA"
+            ormsg = rf"""
+{rtype} 
+
+💰 {amounI} #{tokenI.upper()} **por** {amounO} #{tokenO.upper()}        
+💹 Tasa de cambio: {(amounO/amounI):.3f}             
+🏧 Medio de pago: {pmethod}           
+
+Cuenta garante: @`{receptor}`
+
+Datos del ofertante:
+🔁 Operaciones terminadas: {await dmr.getUserNorder(username)}  
+🎖 Reputación en HIVE: {await beem_reputationHiveUser(xhiveuser):.2f}   
+"""
+#
+            idx = getIdfromHash(ormsg)
+
+        # ormsg = ormsg+"\n" + \
+        #    f"Tomar orden `{idx}` [AQUI]()     "
+            keyboard = [[InlineKeyboardButton(
+                f"Tomar orden {idx}", url=f"{boturl}?start=take_{idx}")]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            sent_message = await context.bot.send_message(chat_id=hcbchatid, text=ormsg, parse_mode='Markdown', reply_markup=reply_markup)
+            chatlink = f"https://t.me/{sent_message.chat.username}/{sent_message.message_id}"
+            status = "nuevo"
+            await dmr.setOrder(idx, username, stype, amounI, tokenI, amounO, tokenO, pmethod, chatlink, status)
+            msout = f"""
+Oferta `{idx}` 
+Publicada en {chatlink} 
+
+Puede cancelarla **si aún no ha sido tomada**.  
+
+🚨 Una vez tomada **solo la parte que envía HIVE o HBD** podrá cancelar la orden y la otra parte podrá
+abrir una disputa.            
+"""
+            keyboard = [[InlineKeyboardButton(
+                f"Cancelar orden {idx}", url=f"{boturl}?start=cancel_{idx}")]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_markdown(msout, reply_markup=reply_markup)
+        else:  # EN
+            rtype = "🟢 #BUY"
+            if stype == "sell":
+                rtype = "🔴 #SELL"
+            ormsg = rf"""
+{rtype} 
+
+💰 {amounI} #{tokenI.upper()} **by** {amounO} #{tokenO.upper()}        
+💹 Exchange rate: {(amounO/amounI):.3f}             
+🏧 Means of payment: {pmethod}           
+
+Guarantor account: @`{receptor}`
+
+Details of the bidder:
+🔁 Completed operations: {await dmr.getUserNorder(username)}  
+🎖 Reputation in HIVE: {await beem_reputationHiveUser(username):.2f}   
+"""
+#
+            idx = getIdfromHash(ormsg)
+
+        # ormsg = ormsg+"\n" + \
+        #    f"Tomar orden `{idx}` [AQUI]()     "
+            keyboard = [[InlineKeyboardButton(
+                f"Take order {idx}", url=f"{boturl}?start=take_{idx}")]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            sent_message = await context.bot.send_message(chat_id=hcbchatid, text=ormsg, parse_mode='Markdown', reply_markup=reply_markup)
+            chatlink = f"https://t.me/{sent_message.chat.username}/{sent_message.message_id}"
+            status = "nuevo"
+            await dmr.setOrder(idx, username, stype, amounI, tokenI, amounO, tokenO, pmethod, chatlink, status)
+            msout = f"""
+Offer `{idx}` 
+Published in {chatlink} 
+
+You can cancel it ** if it hasn't been taken yet**.
+
+🚨 Once taken **only the party sending HIVE or HBD** will be able to cancel the order, and the other party will
+open a dispute.           
+"""
+            keyboard = [[InlineKeyboardButton(
+                f"Cancel order {idx}", url=f"{boturl}?start=cancel_{idx}")]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_markdown(msout, reply_markup=reply_markup)
+
+    else:
+        errms = {'es': f"""
+Comando incorrecto debe ser por ejemplo: 
+/{stype} 10 HBD 3000 CUP Trasfermóvil o Enzona
+""", 'en': f"""
+Incorrect command must be for example: 
+/{stype} 10 HBD 3000 CUP Transfermobile or Enzone
+"""}
+        await update.message.reply_text(errms.get(scode))
+
+
+async def sell(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /sell -Place a sales order
+    stype = "sell"
+    await setorder(stype, update, context)
+
+
+async def buy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /buy -Place a purchase order
+    stype = "buy"
+    await setorder(stype, update, context)
+
+
+async def hiveuser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /hiveuser -Register your HIVE user
+    user = update.effective_user
+    chatid = update.message.chat_id
+    scode = getlang(user.language_code)
+    if chatid in blacklist:
+        msg = {'es': 'Usuario restringido',
+               'en': 'Restricted user'}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:
+        username = user.username.lower()
+        stext = update.message.text.split()
+        if len(stext) < 2:
+            msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /hiveuser juanperes ',
+                   'en': 'Incorrect command, must be for example: /hiveuser juanperes '}
+            await update.message.reply_text(msg.get(scode))
+            return None
+        hiveU = stext[1].lower()
+        status = veryfyHiveUser(hiveU)
+        await dmr.setUserhiveuser(username, hiveU, status)
+        if status:
+            msg = {'es': f"Usuario {hiveU} registrado correctamente, gracias por apoyar a `{manager}`",
+                   'en': f"User {hiveU} is now successfully registered, thank you for supporting `{manager}`"}
+            await update.message.reply_markdown(msg.get(scode))
+        else:
+            msg = {'es': f"Usuario {hiveU} registrado correctamente, delegue al menos 50 HP a `{manager}` para disfrutar cero comisiones",
+                   'en': f"User {hiveU} is now registered correctly, delegate at least 50 HP to `{manager}` to enjoy zero commissions"}
+            await update.message.reply_markdown(msg.get(scode))
+            await update.message.reply_markdown(messages_notHP.get(scode))
+# OKX
+
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /escrow -Know the available commands
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:        
+        mback = {'es': 'Retornar','en': 'Back'}
+        keyboard = [[InlineKeyboardButton(rf"{mback.get(scode)}",callback_data="_into_")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(messages_help.get(scode),
+                                        parse_mode='Markdown', reply_markup=reply_markup)
+        
+        
+        
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /start -Reset your user's settings
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+    else:
+        username = user.username.lower()
+        chatid = update.message.chat_id
+        stext = update.message.text.split()
+        if len(stext) == 1:            
+            mhelp = {'es': 'Ayuda',
+                     'en': 'Help'}           
+            keyboard = [[InlineKeyboardButton(rf"{mhelp.get(scode)}",
+                                              callback_data="_help_")]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            await update.message.reply_markdown(messages_about.get(scode),
+                                                reply_markup=reply_markup)                       
+            if not await dmr.checkUser(username):
+                await dmr.setUserchatid(username, chatid)            
+        else:
+            textstruct = stext[1].split('_')
+            command = textstruct[0]
+            match command:
+                case 'cancel':
+                    await scancel(update, context, textstruct)
+                case 'take':
+                    await stake(update, context, textstruct)
+                case 'totake':
+                    await totake(update, context, textstruct)
+                case 'hivesend':
+                    await hivesend(update, context, textstruct)
+                case 'fiatsend':
+                    await fiatsend(update, context, textstruct)
+                case 'finish':
+                    await finish(update, context, textstruct)
+                case 'dispute':
+                    await dispute(update, context, textstruct)
+                case 'help':
+                    await help(update,context)                    
+                case _:
+                    await context.bot.send_message(chat_id=update.effective_chat.id, text="Enlaces de órdenes por implementar")
+        await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)

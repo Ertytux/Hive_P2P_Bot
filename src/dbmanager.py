@@ -273,7 +273,7 @@ SELECT id,order_date FROM postorders  WHERE status='nuevo';
 # OK
 
 
-async def getUsersChats() -> list:
+async def getUsersChats() -> tuple:
     kDB = await dbm.connect(userfile)
     command = f"""
 SELECT chatid FROM users  ;

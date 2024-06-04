@@ -1,12 +1,26 @@
 start -Reset your user's settings
-escrow -Learn about our escrow system at HIVE
+help -Know the available commands
 hiveuser -Register your HIVE user
-userinfo -Display the user's information
 buy -Place a purchase order
 sell -Place a sales order
 cancel -Delete an order
 listorder -Show the list of active orders
+userinfo -Display the user's information
 fees -Know the service fees
 prices -Know the reference prices according to Coingecko and yadio.io
 price -To know the price of a currency using Coingecko as a reference and yadio.io
+escrow -Learn about our escrow system at HIVE
 msg -Send messages to the offers channel (Admins only)
+notify -Send a notification to all users (Admins only)
+ordersclean -Delete orders that have been posted for more than 36 hours (Admins only)
+dailyorderclean -Automatically activates the /ordersclean command once a day (Admins only)
+stopordersclean -Stop /dailyorderclean (Admins only)
+release -Release the funds of a order on dispute to the receiver (Admins only)
+back -Return the funds of a funds deposit to the sender and cancel the order (Admins only)
+orderinfo -Get all info about a order (Admins only)
+
+
+
+
+
+

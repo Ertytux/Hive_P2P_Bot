@@ -1,7 +1,6 @@
 from datetime import datetime
 import base64
 
-
 def is_number(s: str) -> bool:
     """ Returns True if string is a number. """
     try:
@@ -9,7 +8,6 @@ def is_number(s: str) -> bool:
         return True
     except ValueError:
         return False
-
 
 def getHoursfromDate(strdate: str) -> int:
     now = datetime.now()
@@ -19,16 +17,26 @@ def getHoursfromDate(strdate: str) -> int:
 
 
 b64u_lookup = {'/': '_', '_': '/', '+': '-', '-': '+', '=': '.', '.': '='}
-def btoa(x): return base64.b64decode(x)
-def atob(x): return base64.b64encode(bytes(x, 'utf-8')).decode('utf-8')
+def btoa(x:str)->str: return base64.b64decode(x)
+def atob(x:str)->str: return base64.b64encode(bytes(x, 'utf-8')).decode('utf-8')
 
 
 def genb64U(x: str) -> str:
-    lt = list(x)
+    lt = list(atob(x))
     tro = []
     for el in lt:
         em = b64u_lookup.get(el, el)
         tro.append(em)
     return "".join(tro)
+
+def recb64U(x:str)->str:
+    lt = list(x)
+    tro = []
+    for el in lt:
+        em = b64u_lookup.get(el, el)
+        tro.append(em)
+    er="".join(tro)    
+    return btoa(er)
+#DB
 
 

@@ -1,4 +1,3 @@
-import os
 from beem.account import Account
 from beem.exceptions import AccountDoesNotExistsException
 from beem import Hive
@@ -7,13 +6,12 @@ from beem.transactionbuilder import TransactionBuilder
 from beem.amount import Amount
 import json
 import dbmanager as dmr
-from tools import atob, genb64U
-
+from tools import  genb64U
 import pymssql
-
-
 from config import (hivesqldb, hivesqlpsw, hivesqlserver,
-                    hivesqluser, fhbd, fhive,fpp, receptor, manager, activekey)
+                    hivesqluser, fhbd, fhive,fpp, receptor, 
+                    manager, activekey,dHP)
+
 
 hive = Hive()
 
@@ -41,7 +39,7 @@ def veryfyHiveUser(hiveuser: str) -> int:
         return 0
     user_delegate_vests = int(isdelegate[0]['vesting_shares']['amount'])
     delegation = hive.vests_to_hp(user_delegate_vests)/1e6
-    if delegation >= 50.0:
+    if delegation >= dHP:
         return 1
     return 0
 
@@ -118,13 +116,12 @@ def sendHive(hiveuser: str, amount: float, token: str) -> None:
     tx.broadcast()
 
 
-def encodeTrans(amount: float, token: str, memo: str) -> str:
-    transfer_op = ["transfer", {
-        'to': receptor,
-        'amount': f"{amount:.3f} {token.upper()}",
-        'memo': memo
-    }]
-    jst = json.dumps(transfer_op)
-    bs64u = genb64U(atob(jst))
-    return bs64u
+def encodeTrans(amount:float,token:str,memo:str)->str:
+    transfer_op =["transfer", {
+      'to':manager,
+      'amount':f"{amount:.3f} {token.upper()}",
+      'memo': memo
+      }]
+    jst=json.dumps(transfer_op)   
+    return genb64U(jst)
 

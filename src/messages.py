@@ -3,7 +3,30 @@ from config import manager,hcbchatid,hcbsup,fpp,fhive,fhbd
 messages_about = {'es': rf"""
 Este es un bot para la publicación y gestión de ofertas de intercambio P2P en HIVE.
 
-Utilice los comandos:	
+Utilice el comando /help para conocer los comandos más comunes.	
+
+
+Visite el canal de ofertas {hcbchatid}	
+
+Si algo sale mal, intente ejecutar /start o comentarnos en nuestro [grupo de soporte]({hcbsup}), recuerde que estamos en proceso de desarrollo.
+
+Gracias!!
+""", 'en': rf"""
+This is a bot for publishing and managing P2P exchange offers on HIVE.
+
+Use the /help command to find out the most common commands.
+
+
+Visit the offers channel {hcbchatid}		
+
+If something goes wrong, try to run /start or comment us in our [support group]({hcbsup}), remember that we are in the process of development.
+
+Thank you!!
+"""}
+
+
+messages_help = {'es': rf"""
+Comandos:	
 /start -Reiniciar la configuración de su usuario 🟢
 /escrow -Conocer sobre  nuestro sistema de escrow en HIVE 🔄		
 /hiveuser -Registrar su usuario de HIVE	👤	
@@ -13,17 +36,12 @@ Utilice los comandos:
 /listorder -Mostrar el listado de órdenes activas	📝	
 /prices -Conocer los precios de referencia según Coingecko y yadio.io 📈
 /price -Conocer el precio de una moneda usando de referencia  Coingecko y yadio.io 💶
-/msg -Enviar mensajes al canal de ofertas (Solo Admins) 🔐
-
-Visite el canal de ofertas {hcbchatid}		
 
 Si algo sale mal, intente ejecutar /start o comentarnos en nuestro [grupo de soporte]({hcbsup}), recuerde que estamos en proceso de desarrollo.
 
 Gracias!!
 """, 'en': rf"""
-This is a bot for publishing and managing P2P exchange offers on HIVE.
-
-Use the commands:	
+Commands:	
 /start - Restart your user's settings 🟢
 /escrow - Learn about our  escrow system in HIVE 🔄		
 /hiveuser - Register your HIVE username 👤	
@@ -33,9 +51,6 @@ Use the commands:
 /listorder - Show the list of active orders 📝	
 /prices - Know about the prices of reference according to Coingecko and yadio.io 📈
 /price - Know the price of one currency using the reference Coingecko and yadio.io 💶
-/msg - Send messages to the offers channel (Admins only) 🔐
-
-Visit the offers channel {hcbchatid}		
 
 If something goes wrong, try to run /start or comment us in our [support group]({hcbsup}), remember that we are in the process of development.
 

@@ -38,10 +38,22 @@ fpp = 0.3e-2
 fhbd = 0.05
 fhive = 0.17
 
+# Min Delegation to Zero fee
+dHP = 50.0
+
 
 # admins and support
-admins = ['ertytux']
-supports = ['ertytux']
+admins = ['ertytux', 'manuphotos']
+supports = ['ertytux', 'manuphotos']
 
 # Telegram user ID in blacklist
-blacklist = ['',]
+blacklist = ['5697805901']
+
+# Supported languages
+slang = ['es', 'en']
+
+# Communities
+communities = {'mycomm': 'hivecuba'}
+
+# HIVE tokens to exchange
+tokenAcepted = ['HIVE', 'HBD']
