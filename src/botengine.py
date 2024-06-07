@@ -3,7 +3,7 @@
 import os
 import datetime
 import qrcode
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, MenuButton
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from config import (hcbchatid, blacklist, admins,
                     supports, boturl, hcbchatid, receptor,
@@ -23,21 +23,13 @@ squence = ['amouni', 'tokeni', 'amouno', 'tokeno', 'pmetod']
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
-   
+
     query = update.callback_query
     await query.answer()
     if query.data == "_Erase_":
-        await context.bot.delete_message(chat_id=update.effective_chat.id, 
+        await context.bot.delete_message(chat_id=update.effective_chat.id,
                                          message_id=update.effective_message.id)
         await context.user_data.clear()
-        return None
-    if query.data == "_help_":
-        await context.bot.delete_message(chat_id=update.effective_chat.id, 
-                                         message_id=update.effective_message.id)                
-        return None
-    if query.data == "_into_":
-        await context.bot.delete_message(chat_id=update.effective_chat.id, 
-                                         message_id=update.effective_message.id)        
         return None
     return None
 
@@ -71,6 +63,11 @@ async def stake(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: list)
     if xhiveuser == None or xhiveuser == '':
         msg = {'es': 'Debe registrar primero su usuario de HIVE con: /hiveuser nombreusuario',
                'en': 'You must first register your HIVE user with: /hiveuser username'}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    if veryfyHiveUser(xhiveuser) == -1:
+        msg = {'es': 'Usuario de HIVE no válido',
+               'en': 'Invalid HIVE user'}
         await update.message.reply_text(msg.get(scode))
         return None
 
@@ -189,6 +186,11 @@ async def totake(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: list
     if xhiveuser == None or xhiveuser == '':
         msg = {'es': 'Debe registrar primero su usuario de HIVE con /hiveuser nombreusuario',
                'en': 'You must first register your HIVE user with /hiveuser username'}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    if veryfyHiveUser(xhiveuser) == -1:
+        msg = {'es': 'Usuario de HIVE no válido',
+               'en': 'Invalid HIVE user'}
         await update.message.reply_text(msg.get(scode))
         return None
 
@@ -570,6 +572,11 @@ async def fiatsend(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: li
     if xhiveuser == None or xhiveuser == '':
         msg = {'es': 'Debe registrar primero su usuario de HIVE con: /hiveuser nombreusuario',
                'en': 'You must first register your HIVE user with: /hiveuser username'}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    if veryfyHiveUser(xhiveuser) == -1:
+        msg = {'es': 'Usuario de HIVE no válido',
+               'en': 'Invalid HIVE user'}
         await update.message.reply_text(msg.get(scode))
         return None
 
@@ -1234,6 +1241,11 @@ async def setorder(stype: str, update: Update, context: ContextTypes.DEFAULT_TYP
 
     if xhiveuser == None or xhiveuser == '':
         await update.message.reply_text(messages_notSt.get(scode))
+        return None      
+    if veryfyHiveUser(xhiveuser) == -1:
+        msg = {'es': 'Usuario de HIVE no válido',
+               'en': 'Invalid HIVE user'}
+        await update.message.reply_text(msg.get(scode))
         return None
 
     mtext = update.message.text
@@ -1401,6 +1413,11 @@ async def hiveuser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             return None
         hiveU = stext[1].lower()
         status = veryfyHiveUser(hiveU)
+        if status == -1:
+            msg = {'es': 'Usuario de HIVE no válido',
+                   'en': 'Invalid HIVE user'}
+            await update.message.reply_text(msg.get(scode))
+            return None
         await dmr.setUserhiveuser(username, hiveU, status)
         if status:
             msg = {'es': f"Usuario {hiveU} registrado correctamente, gracias por apoyar a `{manager}`",
@@ -1414,25 +1431,28 @@ async def hiveuser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 # OKX
 
 
-async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def shelp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # /escrow -Know the available commands
     user = update.effective_user
     scode = getlang(user.language_code)
     if user.username == '' or user.username == None:
         await update.message.reply_markdown(messages_statU.get(scode))
-    else:        
-        mback = {'es': 'Retornar','en': 'Back'}
-        keyboard = [[InlineKeyboardButton(rf"{mback.get(scode)}",callback_data="_into_")]]
+    else:
+        mback = {'es': 'Retornar', 'en': 'Back'}
+        keyboard = [[InlineKeyboardButton(
+            rf"{mback.get(scode)}", url=f"{boturl}?start=start_0")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(messages_help.get(scode),
                                         parse_mode='Markdown', reply_markup=reply_markup)
         
-        
-        
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # /start -Reset your user's settings
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /escrow -Know the available commands
+    await shelp(update, context)
+
+
+async def sstart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     scode = getlang(user.language_code)
     if user.username == '' or user.username == None:
@@ -1441,17 +1461,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         username = user.username.lower()
         chatid = update.message.chat_id
         stext = update.message.text.split()
-        if len(stext) == 1:            
+        if len(stext) == 1:
             mhelp = {'es': 'Ayuda',
-                     'en': 'Help'}           
+                     'en': 'Help'}
             keyboard = [[InlineKeyboardButton(rf"{mhelp.get(scode)}",
-                                              callback_data="_help_")]]
+                                              url=f"{boturl}?start=help_0")]]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             await update.message.reply_markdown(messages_about.get(scode),
-                                                reply_markup=reply_markup)                       
+                                                reply_markup=reply_markup)
             if not await dmr.checkUser(username):
-                await dmr.setUserchatid(username, chatid)            
+                await dmr.setUserchatid(username, chatid)
         else:
             textstruct = stext[1].split('_')
             command = textstruct[0]
@@ -1471,7 +1491,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 case 'dispute':
                     await dispute(update, context, textstruct)
                 case 'help':
-                    await help(update,context)                    
+                    await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id-1)
+                    await help(update, context)
+                case 'start':
+                    await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id-1)
+                    mhelp = {'es': 'Ayuda',
+                             'en': 'Help'}
+                    keyboard = [[InlineKeyboardButton(rf"{mhelp.get(scode)}",
+                                                      url=f"{boturl}?start=help_0")]]
+                    reply_markup = InlineKeyboardMarkup(keyboard)
+                    await update.message.reply_markdown(messages_about.get(scode),
+                                                        reply_markup=reply_markup)
                 case _:
                     await context.bot.send_message(chat_id=update.effective_chat.id, text="Enlaces de órdenes por implementar")
-        await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
+            await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # /start -Reset your user's settings
+    await sstart(update, context)

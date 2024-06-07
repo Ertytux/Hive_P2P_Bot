@@ -34,7 +34,7 @@ def veryfyHiveUser(hiveuser: str) -> int:
         isdelegate = Account(hiveuser).get_vesting_delegations(manager)
     except:
         # hiversuser not exist
-        return 0
+        return -1
     if len(isdelegate) == 0:
         return 0
     user_delegate_vests = int(isdelegate[0]['vesting_shares']['amount'])
