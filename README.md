@@ -110,9 +110,9 @@ export bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
 ```
 
 **Note:** Deactivate the virtual environment after finishing.
+To exit the virtual environment, execute the following command:
 
 ```Bash
-To exit the virtual environment, execute the following command:
 cd Hive_P2P_Bot
 
 Windows
