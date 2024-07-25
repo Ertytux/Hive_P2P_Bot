@@ -39,16 +39,17 @@ python3 -m venv env
 * Activate the virtual environment
 
 ```Bash
-Windows
+#Windows
 env\Scripts\activate
 
-macOS or Linux
+#macOS or Linux
 env/bin/activate
 ```
 
 * Install the packages from the requirements.txt file
 
 ```Bash
+pip install flask
 pip install -r requeriment.txt
 ```
 
@@ -77,9 +78,10 @@ msg -Send messages to the offers channel (Admins only)
 * Create a receptor account in HIVE that operates the bot.
 * Designate an account manager in HIVE that will receive HP delegations to have zero fees.
 * Create a Telegram channel for offers and add the bot user as administrator. You can also associate a chat group to serve as support.
-* With the information collected in the previous steps edit the _env_example_ file.
+* With the information collected in the previous steps edit the _env_example_ file (Linux / macOS) or .env_example.bat (Windows).
 
 ```Bash
+#env_example file Linux or macOS
 #BOT
 export hcbtoken=YOUR_BOT_TOKEN
 export hcburl=https://t.me/YOUR_BOT_USERNAME
@@ -102,11 +104,36 @@ export activekey=YOUR_BOT_HIVE_ACTIVE_KEY
 export bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
 ```
 
+* Windows .env_example.bat
+**Note:** You can copy .env_example.bat to a new .env.bat and execute call .env.bat
+
+```Bash
+set hcbtoken=YOUR_BOT_TOKEN
+set hcburl=https://t.me/YOUR_BOT_USERNAME
+
+set hivesqlserver=vip.hivesql.io
+set hivesqldb=DBHive
+set hivesqluser=YOUR_HIVESQL_USERNAME
+set hivesqlpsw=YOUR_HIVESQL_PASSWD
+
+set hcbchat=@YOUR_TELEGRAM_OFFERT_CHANNEL
+
+
+set bothiveuser=YOUR_BOT_HIVE_USERNAME
+set activekey=YOUR_BOT_HIVE_ACTIVE_KEY
+
+set bothivedelegate=YOUR_DELEGATE_HIVE_USERNAME
+```
+
 * Edit the file _src/config.py_ with your personalized settings. You must designate at least one Telegram user as an administrator and support
 * Run and setup into operations the bot with the command:
 
 ```Bash
+#Linux or macOS
 ./run.sh
+
+#Windows
+call .env_sample.bat
 ```
 
 **Note:** Deactivate the virtual environment after finishing.
