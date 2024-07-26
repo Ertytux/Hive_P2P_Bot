@@ -3,6 +3,7 @@ from botengine import (start, help, escrow, prices, price, userinfo, hiveuser, m
                        buy, sell, cancel, listorders, notify, button, orderClean,
                        setdailyOrderClean, stopdailyOrderClean, release, back,
                        orderinfo, fees, convert)
+from vipengine import posr
 from error_callback import error_callback
 from config import hcbtoken
 from logger import logger
@@ -49,6 +50,8 @@ def main() -> None:
     application.add_handler(CommandHandler("price", price))
     application.add_handler(CommandHandler("convert", convert))
     application.add_handler(CommandHandler("escrow", escrow))
+    # VIPs
+    application.add_handler(CommandHandler("pos", posr))
     # Admins
     application.add_handler(CommandHandler("msg", msg))
     application.add_handler(CommandHandler("notify", notify))

@@ -17,6 +17,7 @@ from verifyhive import (veryfyHiveUser, verifytransact,
 import dbmanager as dmr
 from messages import *
 import rates as rt
+from vipengine import sposr
 
 squence = ['amouni', 'tokeni', 'amouno', 'tokeno', 'pmetod']
 
@@ -29,8 +30,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if query.data == "_Erase_":
         await context.bot.delete_message(chat_id=update.effective_chat.id,
                                          message_id=update.effective_message.id)
-        await context.user_data.clear()
+        context.user_data.clear()
         return None
+    
+    stext=query.data.split('_')
+    if stext[0]=="Erase":
+        skey=stext[1]
+        await context.bot.delete_message(chat_id=update.effective_chat.id,
+                                         message_id=update.effective_message.id)
+        del context.user_data[skey]
+        return None
+
     return None
 
 
@@ -241,6 +251,40 @@ async def totake(update: Update, context: ContextTypes.DEFAULT_TYPE, stext: list
             fee = await getFee(sender, tokeni, amouni)
             odata = encodeTrans(float(f"{(amouni+fee):.3f}"), tokeni, orderid)
             sig = f"hive://sign/op/{odata}"
+            docpay=rf"""
+ <!DOCTYPE html>
+<html>
+<head>
+<title>Pay with KeyChain</title>
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+</script>
+</head>
+<body>
+<div>
+<center>
+<h1> Invoice </h1>
+Pay to: <pre>{receptor}<pre>
+<br>
+Amount: <pre>{f"{(amouni+fee):.3f} {tokeni.upper()}"}<pre>
+<br>
+Memo: <pre>{orderid}<pre>
+<br>
+<b>Direct Link</b><br>
+<a href="{sig}">Clic Here to Pay (Only Mobile)</a>
+<br>
+<h1>Or scan the QR</h1>
+<div id="qrcode"></div>
+<script>
+var qrcode = new QRCode("qrcode","{sig}");
+</script>
+</center>
+</div>
+</body>
+</html> 
+"""
+            with open(f"orders/Pay_{orderid}.html",'w') as f:
+                f.write(docpay)
             if scode == 'es':
                 sendmsg_s = rf"""
 Orden tomada `{orderid}`
@@ -254,6 +298,9 @@ En el monto a enviar está incluido un fee de {fee:.3f} {tokeni}
 Puede evitar las comisiones en próximas operaciones delegando al menos 50 HP al usuario de HIVE `{manager}`.
 
 Puede escanear el **QR** mostrado desde la aplicación móvil KeyChain. 
+
+También puede descargar el documento HTML adjuntado con un enlace de pago automático
+accesible desde la aplicación móvil Hive-KeyChain.
 
 Al realizar la transferencia **Confirme**. 
 
@@ -273,8 +320,13 @@ Tiene la posibilidad de **Cancelar** la orden si no ha realizado el depósito.
                                              photo=open(
                                                  f"orders/QR_{orderid}.png", 'rb'),
                                              caption=sendmsg_s,
-                                             parse_mode='Markdown', reply_markup=reply_markup)
+                                             parse_mode='Markdown', reply_markup=reply_markup)                
                 os.remove(f"orders/QR_{orderid}.png")
+                await context.bot.send_document(chat_id=chatid_s,
+                                                document=open(f"orders/Pay_{orderid}.html",'rb'))
+                
+                os.remove(f"orders/Pay_{orderid}.html")
+                
 
             # await context.bot.send_message(chat_id=chatid_s,
             #                               text=sendmsg_s, parse_mode='Markdown',
@@ -314,6 +366,9 @@ You can avoid commissions on upcoming trades by delegating at least 50 HP to the
 
 You can scan the **QR** displayed from the KeyChain mobile app. 
 
+You can also download the attached HTML document with an automatic payment link
+accessible from the Hive-KeyChain mobile application.
+
 When making the transfer **Confirm**.
 
 The receiving user will be notified about it. 
@@ -334,6 +389,10 @@ You have the possibility to **Cancel** the order if you have not made the deposi
                                              caption=sendmsg_s,
                                              parse_mode='Markdown', reply_markup=reply_markup)
                 os.remove(f"orders/QR_{orderid}.png")
+                await context.bot.send_document(chat_id=chatid_s,
+                                                document=open(f"orders/Pay_{orderid}.html",'rb'))
+                
+                os.remove(f"orders/Pay_{orderid}.html")            
 
             # await context.bot.send_message(chat_id=chatid_s,
             #                               text=sendmsg_s, parse_mode='Markdown',
@@ -1508,6 +1567,8 @@ async def sstart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                     await finish(update, context, textstruct)
                 case 'dispute':
                     await dispute(update, context, textstruct)
+                case 'sposr':
+                    await sposr(update, context, textstruct)
                 case 'help':
                     await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id-1)
                     await help(update, context)
