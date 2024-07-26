@@ -1054,6 +1054,24 @@ async def prices(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(rt.getPrices())
 
 
+async def convert(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Convert an amount from one currency to another command /convert\n
+    Command: /convert 1 HBD CUP
+    """
+    user = update.effective_user
+    scode = getlang(user.language_code)
+    if user.username == '' or user.username == None:
+        await update.message.reply_markdown(messages_statU.get(scode))
+        return None
+    stext = update.message.text.split()
+    if len(stext) < 4:
+        msg = {'es': 'Comando incorrecto, debe ser por ejemplo: /convert 1 HBD CUP ',
+               'en': 'Incorrect command, it must be for example: /convert 1 HBD CUP '}
+        await update.message.reply_text(msg.get(scode))
+        return None
+    await update.message.reply_text(rt.getExchange(stext[1],stext[2],stext[3]))
+
+
 async def fees(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # /fees -Know the service fees
     user = update.effective_user
