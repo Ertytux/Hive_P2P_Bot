@@ -36,6 +36,7 @@ Comandos:
 /listorder -Mostrar el listado de órdenes activas	📝	
 /prices -Conocer los precios de referencia según Coingecko y yadio.io 📈
 /price -Conocer el precio de una moneda usando de referencia  Coingecko y yadio.io 💶
+/convert -Convertir una cantidad de dinero de una moneda a otra usando de referencia  Coingecko y yadio.io 🧮
 
 Si algo sale mal, intente ejecutar /start o comentarnos en nuestro [grupo de soporte]({hcbsup}), recuerde que estamos en proceso de desarrollo.
 
@@ -51,6 +52,7 @@ Commands:
 /listorder - Show the list of active orders 📝	
 /prices - Know about the prices of reference according to Coingecko and yadio.io 📈
 /price - Know the price of one currency using the reference Coingecko and yadio.io 💶
+/convert - Convert an amount from one currency to another 🧮
 
 If something goes wrong, try to run /start or comment us in our [support group]({hcbsup}), remember that we are in the process of development.
 
