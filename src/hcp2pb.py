@@ -2,7 +2,7 @@
 from botengine import (start, help, escrow, prices, price, userinfo, hiveuser, msg,
                        buy, sell, cancel, listorders, notify, button, orderClean,
                        setdailyOrderClean, stopdailyOrderClean, release, back,
-                       orderinfo, fees)
+                       orderinfo, fees, convert)
 from error_callback import error_callback
 from config import hcbtoken
 from logger import logger
@@ -47,6 +47,7 @@ def main() -> None:
     application.add_handler(CommandHandler("fees", fees))
     application.add_handler(CommandHandler("prices", prices))
     application.add_handler(CommandHandler("price", price))
+    application.add_handler(CommandHandler("convert", convert))
     application.add_handler(CommandHandler("escrow", escrow))
     # Admins
     application.add_handler(CommandHandler("msg", msg))
