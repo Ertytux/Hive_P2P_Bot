@@ -9,6 +9,7 @@ userinfo -Display the user's information
 fees -Know the service fees
 prices -Know the reference prices according to Coingecko and yadio.io
 price -To know the price of a currency using Coingecko as a reference and yadio.io
+convert -Convert an amount from one currency to another
 escrow -Learn about our escrow system at HIVE
 msg -Send messages to the offers channel (Admins only)
 notify -Send a notification to all users (Admins only)

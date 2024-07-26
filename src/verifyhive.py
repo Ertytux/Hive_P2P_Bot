@@ -6,7 +6,7 @@ from beem.transactionbuilder import TransactionBuilder
 from beem.amount import Amount
 import json
 import dbmanager as dmr
-from tools import  genb64U
+from tools import  genb64U, recb64U
 import pymssql
 from config import (hivesqldb, hivesqlpsw, hivesqlserver,
                     hivesqluser, fhbd, fhive,fpp, receptor, 
@@ -76,6 +76,26 @@ async def getFee(userx: str, token: str, amoun: float) -> float:
     return fee
 
 
+async def verifytransactE(odata: str) -> bool:
+    try:
+        infot=json.loads(recb64U(odata))[1]
+        to=infot.get('to')
+        amount=infot.get('amount')
+        memo=infot.get('memo')
+        manager_ac = Account(to)
+        transac = manager_ac.get_account_history(index=-1, limit=1000)
+        for tr in transac:
+            if tr == None:
+                continue
+            if tr.get('memo', '') == memo:
+                amount_obj = Amount(tr['amount'])
+                stamount = f"{amount_obj.amount_decimal:.3f} {amount_obj.symbol}"                
+                if stamount ==  amount:
+                    return True        
+    except :
+        return False     
+    return False
+
 async def verifytransact(memo: str) -> bool:
     try:
         manager_ac = Account(receptor)
@@ -116,12 +136,15 @@ def sendHive(hiveuser: str, amount: float, token: str) -> None:
     tx.broadcast()
 
 
-def encodeTrans(amount:float,token:str,memo:str)->str:
+def encodeTransE(to:str,amount:float,token:str,memo:str)->str:
     transfer_op =["transfer", {
-      'to':manager,
+      'to':to,
       'amount':f"{amount:.3f} {token.upper()}",
       'memo': memo
       }]
     jst=json.dumps(transfer_op)   
     return genb64U(jst)
+
+def encodeTrans(amount:float,token:str,memo:str)->str:
+    return encodeTransE(receptor,amount,token,memo)
 
