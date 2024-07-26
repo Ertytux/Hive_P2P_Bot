@@ -4,6 +4,7 @@ from pycoingecko import CoinGeckoAPI
 
 cg = CoinGeckoAPI()
 tkG={'HIVE':'hive','HBD':'hive_dollar'}
+tkY={'USD':'usd','CUP':'cup','MLC':'mlc'}
 
 yadio_url = 'https://api.yadio.io/exrates/USD'
 
@@ -51,3 +52,64 @@ def getPrice(coin:str)->str:
     return msg
 
 
+def getExchange(amount:str, coinFrom:str, coinTo:str)->str:
+    """
+    Convert an amount from one currency to another\n
+    Currency: USD, CUP, MLC, HIVE, HBD
+    """
+    try:
+        # response = requests.get(yadio_url)
+        urlYadio = 'https://api.yadio.io/convert/'
+        urlYadioRate = 'https://api.yadio.io/exrates/USD'
+        divisorSlash = '/'
+        if (coinFrom.upper() in tkY and coinTo.upper() in tkY):
+            """Exchange Yadio CUP MLC USD from Yadio"""
+            convertUrlYadio = f"{urlYadio}{amount}{divisorSlash}{coinFrom.upper()}{divisorSlash}{coinTo.upper()}"
+            response = requests.get(convertUrlYadio)
+            result = response.json().get('result')
+            rate = response.json().get('rate')
+            msg = f"Amount {coinTo.upper()}: {result:.8f} {coinTo.upper()}\nRate: {rate:.8f} USD"
+            # return exchange_result
+        elif (coinFrom.upper() in tkG and coinTo.upper() in tkG and coinFrom.upper() != coinTo.upper()):
+            """Exchange HBD/Hive from Coingecko"""
+            idxFrom = tkG.get(coinFrom.upper())
+            idxTo = tkG.get(coinTo.upper())
+            if idxFrom == 'hive':
+                """Exchange Hive to HBD from Coingecko""" 
+                pHive=float(cg.get_price(ids=idxFrom, vs_currencies='usd')[idxFrom]['usd'])
+                vHive=float(amount)*pHive
+                pHBD=float(cg.get_price(ids=idxTo, vs_currencies='usd')[idxTo]['usd'])
+                result=vHive/pHBD
+                msg = f"Amount {coinTo.upper()}: {result:.8f} {coinTo.upper()}\nRate: {pHBD:.8f} USD"
+                #return exchange_result
+            else:
+                """Exchange HBD to Hive from Coingecko"""
+                pHBD=float(cg.get_price(ids=idxFrom, vs_currencies='usd')[idxFrom]['usd'])
+                vHBD=float(amount)*pHBD
+                pHive=float(cg.get_price(ids=idxTo, vs_currencies='usd')[idxTo]['usd'])
+                result=vHBD/pHive
+                msg = f"Amount {coinTo.upper()}: {result:.8f} {coinTo.upper()}\nRate: {pHive:.8f} USD"
+                # return exchange_result
+        elif (coinFrom.upper() in tkY and coinTo.upper() in tkG):
+            """Exchange from Yadio to Coingecko"""
+            response = requests.get(urlYadioRate)
+            pcoin=float(response.json().get('USD').get(coinFrom.upper()))
+            vcoin=float(amount)/pcoin
+            idxTo = tkG.get(coinTo.upper())
+            pcoinGecko=float(cg.get_price(ids=idxTo, vs_currencies='usd')[idxTo]['usd'])
+            result=vcoin/pcoinGecko
+            msg = f"Amount {coinTo.upper()}: {result:.8f} {coinTo.upper()}\nRate: {pcoinGecko:.8f} USD"
+        elif (coinFrom.upper() in tkG and coinTo.upper() in tkY):
+            """Exchange from Coingecko to Yadio"""
+            response = requests.get(urlYadioRate)
+            idxFrom = tkG.get(coinFrom.upper())
+            pcoinGecko=float(cg.get_price(ids=idxFrom, vs_currencies='usd')[idxFrom]['usd'])
+            vcoin=float(amount)*pcoinGecko
+            pcoin=float(response.json().get('USD').get(coinTo.upper()))
+            result=vcoin*pcoin
+            msg = f"Amount {coinTo.upper()}: {result:.8f} {coinTo.upper()}\nRate: {pcoin:.8f} USD"
+        else:
+            msg=f"No es posible realizar esa conversión\nIt is not available this exchange!!!"
+    except:
+        msg=f"No esta disponible\nIt is not available!!!"
+    return msg
