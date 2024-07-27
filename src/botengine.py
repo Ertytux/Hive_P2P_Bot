@@ -1532,11 +1532,13 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def sstart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     scode = getlang(user.language_code)
+    username = user.username.lower()
+    chatid = update.message.chat_id    
     if user.username == '' or user.username == None:
-        await update.message.reply_markdown(messages_statU.get(scode))
+        await update.message.reply_markdown(messages_statU.get(scode))    
     else:
-        username = user.username.lower()
-        chatid = update.message.chat_id
+        if not await dmr.checkUser(username):
+            await dmr.setUserchatid(username, chatid)        
         stext = update.message.text.split()
         if len(stext) == 1:
             mhelp = {'es': 'Ayuda',
@@ -1546,9 +1548,7 @@ async def sstart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             await update.message.reply_markdown(messages_about.get(scode),
-                                                reply_markup=reply_markup)
-            if not await dmr.checkUser(username):
-                await dmr.setUserchatid(username, chatid)
+                                                reply_markup=reply_markup)            
         else:
             textstruct = stext[1].split('_')
             command = textstruct[0]
