@@ -13,7 +13,7 @@ from tools import getHoursfromDate, is_number
 from genid import getIdfromHash
 from verifyhive import (veryfyHiveUser, verifytransact,
                         sendHive, getFee, encodeTrans,
-                        beem_reputationHiveUser)
+                        reputationHiveUser)
 import dbmanager as dmr
 from messages import *
 import rates as rt
@@ -1163,7 +1163,7 @@ async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 **Usuario de HIVE**: `{data.get('hiveuser')}`
 **Delega a** `{manager}`: {'Si' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
 **Número de órdenes completadas**: `{data.get('norders')}`
-**Reputación en HIVE**: `{await beem_reputationHiveUser(data.get('hiveuser')):.2f}`
+**Reputación en HIVE**: `{await reputationHiveUser(data.get('hiveuser')):.2f}`
 """
         else:
             msg = rf"""
@@ -1171,7 +1171,7 @@ async def userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 **HIVE user**: `{data.get('hiveuser')}`
 ** Delegate to** `{manager}`: {'Yes' if veryfyHiveUser(data.get('hiveuser'))==1 else 'No'}
 **Number of completed orders**: `{data.get('norders')}`
-**Reputation on HIVE**: `{await beem_reputationHiveUser(data.get('hiveuser')):.2f}`
+**Reputation on HIVE**: `{await reputationHiveUser(data.get('hiveuser')):.2f}`
 """
         await update.message.reply_markdown(msg)
 
