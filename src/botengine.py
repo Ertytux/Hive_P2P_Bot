@@ -1375,7 +1375,7 @@ Cuenta garante: @`{receptor}`
 
 Datos del ofertante:
 🔁 Operaciones terminadas: {await dmr.getUserNorder(username)}  
-🎖 Reputación en HIVE: {await beem_reputationHiveUser(xhiveuser):.2f}   
+🎖 Reputación en HIVE: {await reputationHiveUser(xhiveuser):.2f}   
 """
 #
             idx = getIdfromHash(ormsg)
@@ -1417,7 +1417,7 @@ Guarantor account: @`{receptor}`
 
 Details of the bidder:
 🔁 Completed operations: {await dmr.getUserNorder(username)}  
-🎖 Reputation in HIVE: {await beem_reputationHiveUser(username):.2f}   
+🎖 Reputation in HIVE: {await reputationHiveUser(username):.2f}   
 """
 #
             idx = getIdfromHash(ormsg)
